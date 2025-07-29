@@ -11,6 +11,8 @@ function showLogin() {
 function showApp() {
   document.getElementById("auth").classList.add("d-none");
   document.getElementById("app").classList.remove("d-none");
+  const historico = document.getElementById("historicoContainer");
+  if (historico) historico.classList.remove("d-none");
 }
 
 function logout() {
