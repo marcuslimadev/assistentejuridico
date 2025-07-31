@@ -8,32 +8,45 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     html { transition: font-size 0.2s; }
+
     @media (max-width: 640px) {
       .chat-bubble { max-width: 98% !important; font-size: 1rem; }
       .history-panel { border-left: none !important; border-top: 1px solid #e2e8f0; }
+    }
+
+    .chat-background {
+      background-image: url('170f3303-c18b-42ef-bbf0-ff18cf140b8b.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 250px;
+      opacity: 0.05;
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
     }
   </style>
 </head>
 <body class="bg-gradient-to-tr from-slate-200 to-slate-400 min-h-screen flex flex-col items-center font-sans py-0 sm:py-4">
 
-  <!-- LOGO E TÍTULO -->
-  <div class="w-full text-center mt-4">
-    <img src="logo.png" alt="LexPraxis IA" class="mx-auto w-40 sm:w-48 mb-2">
-  </div>
-
   <!-- CONTAINER PRINCIPAL -->
   <div class="w-full max-w-full sm:max-w-6xl rounded-none sm:rounded-3xl overflow-hidden shadow-none sm:shadow-2xl flex flex-col sm:flex-row bg-white/80 border-0 sm:border border-slate-300 h-screen sm:h-[90vh]">
     
     <!-- CHAT -->
-    <div class="flex flex-col flex-1 h-[60vh] sm:h-full">
-      <div class="flex justify-end p-2 gap-2 bg-slate-100 border-b border-slate-200">
+    <div class="flex flex-col flex-1 h-[60vh] sm:h-full relative">
+      <div class="flex justify-end p-2 gap-2 bg-slate-100 border-b border-slate-200 z-10">
         <button onclick="ajustarFonte(-1)" title="Diminuir texto" class="rounded p-1 px-2 bg-slate-200 hover:bg-slate-300 text-lg font-bold text-slate-700">A-</button>
         <button onclick="ajustarFonte(1)" title="Aumentar texto" class="rounded p-1 px-2 bg-slate-200 hover:bg-slate-300 text-lg font-bold text-slate-700">A+</button>
       </div>
-      <div class="flex-1 overflow-y-auto px-2 sm:px-10 py-4 sm:py-8 space-y-5 bg-white/90" id="chatArea">
-        <div id="messages" class="flex flex-col"></div>
+
+      <!-- Fundo marca d’água -->
+      <div class="chat-background"></div>
+
+      <div class="flex-1 overflow-y-auto px-2 sm:px-10 py-4 sm:py-8 space-y-5 bg-white/90 z-10" id="chatArea">
+        <div id="messages" class="flex flex-col relative z-10"></div>
       </div>
-      <form id="messageForm" class="flex items-end gap-2 sm:gap-3 p-2 sm:p-5 bg-slate-100 border-t border-slate-200">
+
+      <form id="messageForm" class="flex items-end gap-2 sm:gap-3 p-2 sm:p-5 bg-slate-100 border-t border-slate-200 z-10">
         <textarea id="mensagem" placeholder="Digite sua mensagem..." required
           class="flex-1 resize-none rounded-xl bg-slate-50 text-slate-800 p-3 min-h-[44px] max-h-[120px] outline-none border border-slate-200 focus:border-slate-400 shadow-sm text-base sm:text-lg"></textarea>
         <button type="submit"
