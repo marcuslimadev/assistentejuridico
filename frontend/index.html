@@ -8,37 +8,50 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     html { transition: font-size 0.2s; }
-
     @media (max-width: 640px) {
       .chat-bubble { max-width: 98% !important; font-size: 1rem; }
       .history-panel { border-left: none !important; border-top: 1px solid #e2e8f0; }
     }
-
-    .chat-background {
-      background-image: url('logo.png');
+    /* Marca d’água centralizada na área do chat */
+    .chat-watermark {
+      background-image: url('febe20e9-3c87-4b59-b6f9-ef30a5942d60.png');
       background-repeat: no-repeat;
       background-position: center;
-      background-size: 300px;
-      opacity: 0.08;
+      background-size: 380px;
+      opacity: 0.06;
       position: absolute;
       inset: 0;
       z-index: 0;
       pointer-events: none;
     }
+    /* Logo lateral esquerda fixa */
+    .sidebar-logo {
+      position: fixed;
+      top: 32px;
+      left: 32px;
+      width: 140px;
+      opacity: 0.93;
+      z-index: 50;
+      pointer-events: none;
+      user-select: none;
+    }
+    @media (max-width: 900px) {
+      .sidebar-logo { display: none; }
+    }
   </style>
 </head>
 <body class="bg-gradient-to-tr from-slate-200 to-slate-400 min-h-screen flex flex-col items-center font-sans py-0 sm:py-4">
 
-  <!-- TESTE VISUAL (remova depois) -->
-  <img src="logo.png" alt="Logo Teste" style="position:fixed;top:8px;left:8px;width:100px;z-index:99999;opacity:0.8;pointer-events:none;">
+  <!-- Logo lateral esquerda (mantida) -->
+  <img src="logo.png" alt="LexPraxis IA" class="sidebar-logo" />
 
   <!-- CONTAINER PRINCIPAL -->
   <div class="w-full max-w-full sm:max-w-6xl rounded-none sm:rounded-3xl overflow-hidden shadow-none sm:shadow-2xl flex flex-col sm:flex-row bg-white/80 border-0 sm:border border-slate-300 h-screen sm:h-[90vh]">
-    
+
     <!-- CHAT -->
     <div class="flex flex-col flex-1 h-[60vh] sm:h-full relative">
-      <!-- Marca d’água -->
-      <div class="chat-background"></div>
+      <!-- Marca d’água central -->
+      <div class="chat-watermark"></div>
 
       <div class="flex justify-end p-2 gap-2 bg-slate-100 border-b border-slate-200 z-10">
         <button onclick="ajustarFonte(-1)" title="Diminuir texto" class="rounded p-1 px-2 bg-slate-200 hover:bg-slate-300 text-lg font-bold text-slate-700">A-</button>
