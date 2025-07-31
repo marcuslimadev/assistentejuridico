@@ -5,6 +5,7 @@ require 'conexao.php';
 $data = json_decode(file_get_contents("php://input"), true);
 $nome = $data["nome"] ?? '';
 $email = $data["email"] ?? '';
+$celular = $data["celular"] ?? '';
 $senha = password_hash($data["senha"] ?? '', PASSWORD_DEFAULT);
 $token = bin2hex(random_bytes(16));
 
@@ -23,11 +24,12 @@ if ($usuario) {
     exit;
 }
 
-// Cadastro novo
-$stmt = $conn->prepare("INSERT INTO usuarios (nome, email, senha, token_validacao) VALUES (?, ?, ?, ?)");
-$stmt->bind_param("ssss", $nome, $email, $senha, $token);
+// Cadastro novo (agora salvando o celular)
+$stmt = $conn->prepare("INSERT INTO usuarios (nome, email, celular, senha, token_validacao) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssss", $nome, $email, $celular, $senha, $token);
 $stmt->execute();
 
 echo "Cadastro realizado. Aguarde liberação manual.";
 ?>
+
 
