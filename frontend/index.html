@@ -19,15 +19,20 @@
       background-repeat: no-repeat;
       background-position: center;
       background-size: 300px;
-      opacity: 0.06;
+      opacity: 0.08;
       position: absolute;
       inset: 0;
       z-index: 0;
       pointer-events: none;
+      /* Remova o border abaixo quando tiver certeza que está funcionando */
+      border: 2px dashed #00f;
     }
   </style>
 </head>
 <body class="bg-gradient-to-tr from-slate-200 to-slate-400 min-h-screen flex flex-col items-center font-sans py-0 sm:py-4">
+
+  <!-- TESTE VISUAL (remova depois) -->
+  <img src="logo.png" alt="Logo Teste" style="position:fixed;top:8px;left:8px;width:100px;z-index:99999;opacity:0.8;pointer-events:none;">
 
   <!-- CONTAINER PRINCIPAL -->
   <div class="w-full max-w-full sm:max-w-6xl rounded-none sm:rounded-3xl overflow-hidden shadow-none sm:shadow-2xl flex flex-col sm:flex-row bg-white/80 border-0 sm:border border-slate-300 h-screen sm:h-[90vh]">
