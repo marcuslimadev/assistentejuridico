@@ -10,9 +10,11 @@ $stmt->execute();
 $res = $stmt->get_result()->fetch_assoc();
 if ($res && password_verify($senha, $res["senha"]) && $res["email_validado"]) {
     $_SESSION["usuario_id"] = $res["id"];
-    echo json_encode(["success" => true]);
+    echo json_encode([
+        "success" => true,
+        "usuario_id" => $_SESSION["usuario_id"]
+    ]);
 } else {
     http_response_code(401);
     echo json_encode(["success" => false]);
 }
-?>
