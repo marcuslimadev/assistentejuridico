@@ -29,7 +29,7 @@ $stmt = $conn->prepare("INSERT INTO usuarios (nome, email, celular, senha, token
 $stmt->bind_param("sssss", $nome, $email, $celular, $senha, $token);
 $stmt->execute();
 
-echo "Cadastro realizado. Aguarde liberação manual.";
+echo 'Cadastro realizado com sucesso.';
 ?>
 
 
