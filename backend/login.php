@@ -2,8 +2,8 @@
 session_start();
 require 'conexao.php';
 $data = json_decode(file_get_contents("php://input"), true);
-$email = $data["email"] ?? '';
-$senha = $data["senha"] ?? '';
+$email = trim($data["email"] ?? '');
+$senha = trim($data["senha"] ?? '');
 $stmt = $conn->prepare("SELECT id, senha, email_validado FROM usuarios WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
