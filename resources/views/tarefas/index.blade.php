@@ -19,14 +19,18 @@
                 <tbody>
                     @forelse($tarefas as $tarefa)
                         <tr>
-                            <td>{{ $tarefa->titulo }}</td>
+                            <td><a href="#" class="entity-link">{{ $tarefa->titulo }}</a></td>
                             <td>{{ $tarefa->responsavel->name ?? '-' }}</td>
                             <td>{{ $tarefa->prazo ? \Carbon\Carbon::parse($tarefa->prazo)->format('d/m/Y') : '-' }}</td>
-                            <td><span class="badge bg-secondary">{{ $tarefa->status }}</span></td>
-                            <td><a href="#" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a></td>
+                            <td><span class="badge bg-secondary status-badge">{{ $tarefa->status }}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-sm btn-outline-primary action-btn"><i class="bi bi-eye"></i></a>
+                                </div>
+                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhuma tarefa encontrada.</td></tr>
+                        <tr><td colspan="5" class="text-center empty-state">Nenhuma tarefa encontrada.</td></tr>
                     @endforelse
                 </tbody>
             </table>

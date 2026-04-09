@@ -20,7 +20,7 @@
     @endif
 
     <div class="content-card">
-        <form method="GET" action="{{ route('clientes.index') }}" class="mb-4 d-flex gap-2 flex-wrap" style="max-width: 36rem;">
+        <form method="GET" action="{{ route('clientes.index') }}" class="toolbar-form" style="max-width: 36rem;">
             <input type="text" name="busca" class="form-control" placeholder="Buscar por nome ou CPF/CNPJ..." value="{{ request('busca') }}">
             <button type="submit" class="btn btn-secondary">Buscar</button>
         </form>
@@ -39,26 +39,30 @@
                 <tbody>
                     @forelse($clientes as $cliente)
                         <tr>
-                            <td>{{ $cliente->nome }}</td>
+                            <td>
+                                <a href="#" class="entity-link">{{ $cliente->nome }}</a>
+                            </td>
                             <td>{{ $cliente->cpf_cnpj ?? '-' }}</td>
                             <td>{{ $cliente->celular ?? $cliente->telefone ?? '-' }}</td>
                             <td>
                                 @if($cliente->status == 'ativo')
-                                    <span class="badge bg-success">Ativo</span>
+                                    <span class="badge bg-success status-badge">Ativo</span>
                                 @elseif($cliente->status == 'inativo')
-                                    <span class="badge bg-danger">Inativo</span>
+                                    <span class="badge bg-danger status-badge">Inativo</span>
                                 @else
-                                    <span class="badge text-bg-info">Prospecto</span>
+                                    <span class="badge text-bg-info status-badge">Prospecto</span>
                                 @endif
                             </td>
                             <td>
-                                <a href="#" class="btn btn-sm btn-outline-info" title="Ver Perfil"><i class="bi bi-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-sm btn-outline-primary action-btn" title="Ver Perfil"><i class="bi bi-eye"></i></a>
+                                    <a href="#" class="btn btn-sm btn-outline-secondary action-btn" title="Editar"><i class="bi bi-pencil"></i></a>
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">Nenhum cliente encontrado.</td>
+                            <td colspan="5" class="text-center empty-state">Nenhum cliente encontrado.</td>
                         </tr>
                     @endforelse
                 </tbody>

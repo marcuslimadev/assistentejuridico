@@ -20,7 +20,7 @@
     @endif
 
     <div class="content-card">
-        <form method="GET" action="{{ route('processos.index') }}" class="mb-4 d-flex gap-2 flex-wrap">
+        <form method="GET" action="{{ route('processos.index') }}" class="toolbar-form">
             <input type="text" name="busca" class="form-control" placeholder="Buscar por cliente ou número CNJ..." value="{{ request('busca') }}" style="max-width: 26rem;">
             <select name="status" class="form-select w-auto">
                 <option value="">Status</option>
@@ -48,32 +48,34 @@
                 <tbody>
                     @forelse($processos as $processo)
                         <tr>
-                            <td><strong><a href="#" class="text-info text-decoration-none">{{ $processo->numero_cnj ?: 'Sem número' }}</a></strong></td>
+                            <td><a href="#" class="entity-link">{{ $processo->numero_cnj ?: 'Sem número' }}</a></td>
                             <td>{{ $processo->cliente->nome ?? 'N/A' }}</td>
                             <td>
                                 <div>{{ $processo->tipo_acao ?: '-' }}</div>
-                                <small class="text-body-secondary">{{ $processo->area_direito ?: '-' }}</small>
+                                <span class="inline-meta"><i class="bi bi-briefcase"></i>{{ $processo->area_direito ?: '-' }}</span>
                             </td>
-                            <td><span class="badge bg-secondary text-capitalize">{{ $processo->polo }}</span></td>
+                            <td><span class="badge bg-secondary status-badge text-capitalize">{{ $processo->polo }}</span></td>
                             <td>
                                 @if($processo->status == 'em andamento')
-                                    <span class="badge bg-primary">Em andamento</span>
+                                    <span class="badge bg-primary status-badge">Em andamento</span>
                                 @elseif($processo->status == 'ganho')
-                                    <span class="badge bg-success">Ganho</span>
+                                    <span class="badge bg-success status-badge">Ganho</span>
                                 @elseif($processo->status == 'perdido')
-                                    <span class="badge bg-danger">Perdido</span>
+                                    <span class="badge bg-danger status-badge">Perdido</span>
                                 @elseif(in_array($processo->status, ['encerrado', 'arquivado', 'suspenso']))
-                                    <span class="badge bg-secondary text-capitalize">{{ $processo->status }}</span>
+                                    <span class="badge bg-secondary status-badge text-capitalize">{{ $processo->status }}</span>
                                 @endif
                             </td>
                             <td>
-                                <a href="#" class="btn btn-sm btn-outline-info" title="Ver Detalhes"><i class="bi bi-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-sm btn-outline-primary action-btn" title="Ver Detalhes"><i class="bi bi-eye"></i></a>
+                                    <a href="#" class="btn btn-sm btn-outline-secondary action-btn" title="Editar"><i class="bi bi-pencil"></i></a>
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Nenhum processo encontrado.</td>
+                            <td colspan="6" class="text-center empty-state">Nenhum processo encontrado.</td>
                         </tr>
                     @endforelse
                 </tbody>

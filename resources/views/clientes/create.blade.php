@@ -18,6 +18,8 @@
         <form method="POST" action="{{ route('clientes.store') }}">
             @csrf
             
+            <div class="form-section">
+            <h5 class="section-title">Dados principais</h5>
             <div class="row g-3 mb-3">
                 <div class="col-md-8">
                     <label class="form-label">Nome Completo / Razão Social <span class="text-danger">*</span></label>
@@ -48,7 +50,10 @@
                     </select>
                 </div>
             </div>
+            </div>
 
+            <div class="form-section">
+            <h5 class="section-title">Contato</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label">E-mail</label>
@@ -60,8 +65,7 @@
                     <input type="text" name="celular" class="form-control" value="{{ old('celular') }}">
                 </div>
             </div>
-
-            <hr class="mb-4">
+            </div>
 
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-2"></i> Salvar Cliente</button>

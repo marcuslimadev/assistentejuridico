@@ -18,7 +18,8 @@
         <form method="POST" action="{{ route('processos.store') }}">
             @csrf
             
-            <h5 class="mb-3 border-bottom pb-2">Informações Iniciais</h5>
+            <div class="form-section">
+            <h5 class="section-title">Informações iniciais</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label">Cliente <span class="text-danger">*</span></label>
@@ -36,8 +37,10 @@
                     @error('numero_cnj') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
             </div>
+            </div>
 
-            <h5 class="mb-3 border-bottom pb-2">Detalhes Jurídicos</h5>
+            <div class="form-section">
+            <h5 class="section-title">Detalhes jurídicos</h5>
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <label class="form-label">Tipo de Ação</label>
@@ -76,8 +79,10 @@
                     <input type="number" step="0.01" name="valor_causa" class="form-control" placeholder="0.00" value="{{ old('valor_causa') }}">
                 </div>
             </div>
+            </div>
 
-            <h5 class="mb-3 border-bottom pb-2">Localização e Responsabilidade</h5>
+            <div class="form-section">
+            <h5 class="section-title">Localização e responsabilidade</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label">Tribunal / Comarca / Vara</label>
@@ -104,8 +109,7 @@
                     </select>
                 </div>
             </div>
-
-            <hr class="mb-4">
+            </div>
 
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-2"></i> Salvar Processo</button>

@@ -19,14 +19,21 @@
                 <tbody>
                     @forelse($agendas as $agenda)
                         <tr>
-                            <td>{{ $agenda->titulo }} <br><small class="text-info">{{ $agenda->tipo }}</small></td>
+                            <td>
+                                <a href="#" class="entity-link">{{ $agenda->titulo }}</a>
+                                <br><span class="inline-meta"><i class="bi bi-bookmark-star"></i>{{ $agenda->tipo }}</span>
+                            </td>
                             <td>{{ \Carbon\Carbon::parse($agenda->data_inicio)->format('d/m/Y H:i') }}</td>
                             <td>{{ $agenda->local ?? 'Virtual' }}</td>
-                            <td><span class="badge bg-secondary">{{ $agenda->status }}</span></td>
-                            <td><a href="#" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a></td>
+                            <td><span class="badge bg-secondary status-badge">{{ $agenda->status }}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-sm btn-outline-primary action-btn"><i class="bi bi-eye"></i></a>
+                                </div>
+                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhum evento encontrado na agenda.</td></tr>
+                        <tr><td colspan="5" class="text-center empty-state">Nenhum evento encontrado na agenda.</td></tr>
                     @endforelse
                 </tbody>
             </table>
