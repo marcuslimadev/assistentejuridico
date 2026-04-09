@@ -2,276 +2,1538 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LexPraxis IA - Assistente Jurídico</title>
-  <link rel="icon" type="image/png" href="logo.png">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LexPraxis IA | Assistente Juridico</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem("lp_theme") || "lux";
+      document.write('<link id="themeStylesheet" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/' + savedTheme + '/bootstrap.min.css">');
+    })();
+  </script>
   <style>
-    html { transition: font-size 0.2s; }
-    @media (max-width: 640px) {
-      .chat-bubble { max-width: 98% !important; font-size: 1rem; }
-      .history-panel { border-left: none !important; border-top: 1px solid #e2e8f0; }
+    :root {
+      --lp-bg: #08111d;
+      --lp-bg-start: #08111d;
+      --lp-bg-mid: #0f1d2e;
+      --lp-bg-end: #09121d;
+      --lp-glow-left: rgba(197, 154, 69, 0.24);
+      --lp-glow-right: rgba(61, 95, 150, 0.22);
+      --lp-panel: rgba(8, 16, 28, 0.78);
+      --lp-panel-border: rgba(236, 224, 202, 0.14);
+      --lp-text: #edf2fa;
+      --lp-text-soft: #9aa9bd;
+      --lp-accent: #d6b66d;
+      --lp-accent-strong: #c59a45;
+      --lp-user: linear-gradient(135deg, rgba(197, 154, 69, 0.26), rgba(236, 224, 202, 0.12));
+      --lp-assistant: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 235, 226, 0.94));
+      --lp-assistant-text: #223042;
+      --lp-danger: #f26a63;
+      --lp-success: #74d79c;
+      --lp-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+      --lp-radius-xl: 28px;
+      --lp-radius-lg: 22px;
+      --lp-radius-md: 18px;
     }
-    /* Marca d’água centralizada na área do chat */
-    .chat-watermark {
-      background-image: url('logo.png');
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 380px;
-      opacity: 0.06;
+
+    body[data-theme="lux"] {
+      --lp-bg-start: #f4efe5;
+      --lp-bg-mid: #e6d7bd;
+      --lp-bg-end: #d6c1a1;
+      --lp-glow-left: rgba(255, 255, 255, 0.65);
+      --lp-glow-right: rgba(191, 154, 92, 0.2);
+      --lp-panel: rgba(255, 250, 242, 0.78);
+      --lp-panel-border: rgba(110, 84, 44, 0.16);
+      --lp-text: #372817;
+      --lp-text-soft: #705b42;
+      --lp-accent: #8f5d1e;
+      --lp-accent-strong: #a96f28;
+      --lp-user: linear-gradient(135deg, rgba(169, 111, 40, 0.22), rgba(255, 248, 235, 0.82));
+      --lp-assistant: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 242, 229, 0.96));
+      --lp-assistant-text: #2c2011;
+      --lp-shadow: 0 24px 60px rgba(120, 88, 42, 0.16);
+    }
+
+    body[data-theme="flatly"] {
+      --lp-bg-start: #e8f1f7;
+      --lp-bg-mid: #d0e0ea;
+      --lp-bg-end: #bed3de;
+      --lp-glow-left: rgba(255, 255, 255, 0.55);
+      --lp-glow-right: rgba(33, 124, 186, 0.18);
+      --lp-panel: rgba(248, 252, 255, 0.78);
+      --lp-panel-border: rgba(36, 74, 104, 0.16);
+      --lp-text: #17324a;
+      --lp-text-soft: #547085;
+      --lp-accent: #1f6e9c;
+      --lp-accent-strong: #15608c;
+      --lp-user: linear-gradient(135deg, rgba(31, 110, 156, 0.2), rgba(255, 255, 255, 0.72));
+      --lp-assistant: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(233, 243, 249, 0.95));
+      --lp-assistant-text: #17324a;
+      --lp-shadow: 0 24px 60px rgba(30, 76, 109, 0.16);
+    }
+
+    body[data-theme="sandstone"] {
+      --lp-bg-start: #f0eadf;
+      --lp-bg-mid: #ddd0bb;
+      --lp-bg-end: #c6b090;
+      --lp-glow-left: rgba(255, 255, 255, 0.5);
+      --lp-glow-right: rgba(158, 110, 59, 0.16);
+      --lp-panel: rgba(255, 248, 239, 0.76);
+      --lp-panel-border: rgba(112, 79, 44, 0.14);
+      --lp-text: #3c2c1c;
+      --lp-text-soft: #77624f;
+      --lp-accent: #8a5d33;
+      --lp-accent-strong: #9b6a3a;
+      --lp-user: linear-gradient(135deg, rgba(155, 106, 58, 0.2), rgba(255, 250, 244, 0.7));
+      --lp-assistant: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 236, 224, 0.95));
+      --lp-assistant-text: #342414;
+      --lp-shadow: 0 24px 54px rgba(112, 79, 44, 0.15);
+    }
+
+    body[data-theme="slate"] {
+      --lp-bg-start: #0d1624;
+      --lp-bg-mid: #1a2940;
+      --lp-bg-end: #0e1826;
+      --lp-glow-left: rgba(98, 135, 198, 0.18);
+      --lp-glow-right: rgba(220, 180, 102, 0.12);
+      --lp-panel: rgba(18, 28, 42, 0.8);
+      --lp-panel-border: rgba(184, 203, 227, 0.12);
+      --lp-text: #eef4fc;
+      --lp-text-soft: #a6b8cb;
+      --lp-accent: #d4b46d;
+      --lp-accent-strong: #e1c27f;
+      --lp-user: linear-gradient(135deg, rgba(212, 180, 109, 0.22), rgba(116, 151, 196, 0.14));
+      --lp-assistant: linear-gradient(180deg, rgba(242, 246, 250, 0.98), rgba(222, 231, 240, 0.94));
+      --lp-assistant-text: #1e3146;
+      --lp-shadow: 0 26px 70px rgba(3, 8, 18, 0.38);
+    }
+
+    body[data-theme="darkly"] {
+      --lp-bg-start: #061018;
+      --lp-bg-mid: #0d1d24;
+      --lp-bg-end: #081219;
+      --lp-glow-left: rgba(84, 201, 153, 0.18);
+      --lp-glow-right: rgba(57, 112, 196, 0.14);
+      --lp-panel: rgba(10, 21, 28, 0.82);
+      --lp-panel-border: rgba(168, 214, 199, 0.12);
+      --lp-text: #edf8f3;
+      --lp-text-soft: #98b6ad;
+      --lp-accent: #79d0ad;
+      --lp-accent-strong: #5dbc96;
+      --lp-user: linear-gradient(135deg, rgba(93, 188, 150, 0.2), rgba(75, 129, 190, 0.12));
+      --lp-assistant: linear-gradient(180deg, rgba(237, 247, 243, 0.96), rgba(218, 235, 228, 0.93));
+      --lp-assistant-text: #183028;
+      --lp-shadow: 0 28px 72px rgba(0, 0, 0, 0.42);
+    }
+
+    body[data-theme="yeti"] {
+      --lp-bg-start: #f1f7fb;
+      --lp-bg-mid: #d9e8f2;
+      --lp-bg-end: #c4d7e5;
+      --lp-glow-left: rgba(255, 255, 255, 0.6);
+      --lp-glow-right: rgba(61, 108, 148, 0.14);
+      --lp-panel: rgba(250, 253, 255, 0.8);
+      --lp-panel-border: rgba(63, 98, 127, 0.14);
+      --lp-text: #1b3146;
+      --lp-text-soft: #637d94;
+      --lp-accent: #3e6b90;
+      --lp-accent-strong: #2f5a7d;
+      --lp-user: linear-gradient(135deg, rgba(62, 107, 144, 0.18), rgba(255, 255, 255, 0.78));
+      --lp-assistant: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(236, 244, 249, 0.94));
+      --lp-assistant-text: #1d3549;
+      --lp-shadow: 0 24px 58px rgba(63, 98, 127, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+    html { font-size: 16px; transition: font-size 0.2s ease; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Manrope", sans-serif;
+      color: var(--lp-text);
+      background:
+        radial-gradient(circle at top left, var(--lp-glow-left), transparent 28%),
+        radial-gradient(circle at top right, var(--lp-glow-right), transparent 32%),
+        linear-gradient(135deg, var(--lp-bg-start) 0%, var(--lp-bg-mid) 46%, var(--lp-bg-end) 100%);
+      overflow: hidden;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+
+    button, input, select, textarea { font-family: inherit; }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 22px;
+      height: 100dvh;
+      min-height: 100dvh;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .glass-panel {
+      background: var(--lp-panel);
+      border: 1px solid var(--lp-panel-border);
+      box-shadow: var(--lp-shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 22px;
+      border-radius: var(--lp-radius-xl);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(236, 224, 202, 0.1);
+    }
+
+    .brand-mark { display: flex; align-items: center; gap: 14px; }
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      object-fit: cover;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 6px;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--lp-accent);
+      margin-bottom: 4px;
+    }
+
+    .brand-title, .hero-title {
+      font-family: "Cormorant Garamond", serif;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .brand-subtitle {
+      margin: 6px 0 0;
+      color: var(--lp-text-soft);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .status-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: var(--lp-success);
+      box-shadow: 0 0 0 8px rgba(116, 215, 156, 0.12);
+      flex: 0 0 auto;
+    }
+
+    .sidebar-tools, .history-summary, .workspace-header, .hero, .chat-stage, .composer-panel {
+      border-radius: var(--lp-radius-xl);
+    }
+
+    .sidebar-tools {
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(236, 224, 202, 0.08);
+    }
+
+    .field-label, .telemetry-label, .summary-metric-label, .message-role, .section-title {
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .field-label { display: block; color: var(--lp-text-soft); margin-bottom: 10px; }
+    .input-shell, .select-shell {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(236, 224, 202, 0.12);
+      border-radius: 16px;
+      color: var(--lp-text);
+    }
+
+    .input-shell:focus, .select-shell:focus, .composer-input:focus {
+      border-color: rgba(214, 182, 109, 0.85);
+      box-shadow: 0 0 0 0.22rem rgba(214, 182, 109, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--lp-text);
+    }
+
+    .input-shell::placeholder, .composer-input::placeholder { color: rgba(237, 242, 250, 0.5); }
+    .logout-btn {
+      margin-top: 12px;
+      border-radius: 14px;
+      border-color: rgba(242, 106, 99, 0.6);
+      color: #ffd6d1;
+    }
+
+    .history-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px 18px;
+      background: linear-gradient(135deg, rgba(214, 182, 109, 0.14), rgba(255, 255, 255, 0.04));
+      border: 1px solid rgba(214, 182, 109, 0.22);
+    }
+
+    .summary-metric-label, .telemetry-label, .section-title { color: var(--lp-text-soft); }
+    .summary-metric-value {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--lp-text);
+    }
+
+    .history-region {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .history-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .history-list {
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .history-card {
+      border-radius: var(--lp-radius-md);
+      border: 1px solid rgba(236, 224, 202, 0.1);
+      background: rgba(255, 255, 255, 0.035);
+      overflow: hidden;
+    }
+
+    .history-card summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .history-card summary::-webkit-details-marker { display: none; }
+    .history-process {
+      font-weight: 800;
+      font-size: 0.96rem;
+      word-break: break-word;
+      margin-bottom: 6px;
+    }
+
+    .history-date, .muted {
+      color: var(--lp-text-soft);
+      font-size: 0.82rem;
+    }
+
+    .history-badge, .hero-tag, .usage-pill, .draft-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0.36rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .history-badge, .draft-pill {
+      background: rgba(214, 182, 109, 0.18);
+      color: #ffe6af;
+      border: 1px solid rgba(214, 182, 109, 0.28);
+    }
+
+    .history-body {
+      padding: 0 18px 18px;
+      color: rgba(237, 242, 250, 0.84);
+    }
+
+    .history-hover-card {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1200;
+      width: min(420px, calc(100vw - 24px));
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(236, 224, 202, 0.16);
+      background: rgba(7, 15, 27, 0.96);
+      color: var(--lp-text);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(18px);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate3d(0, 8px, 0);
+      transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+
+    .history-hover-card.visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .history-hover-title {
+      margin: 0 0 6px;
+      font-size: 0.96rem;
+      font-weight: 800;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .history-hover-meta {
+      margin: 0 0 10px;
+      font-size: 0.78rem;
+      color: var(--lp-text-soft);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .history-hover-body {
+      margin: 0;
+      max-height: 220px;
+      overflow: hidden;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.84rem;
+      line-height: 1.52;
+      color: rgba(237, 242, 250, 0.88);
+    }
+
+    .history-preview {
+      margin: 0 0 14px;
+      padding: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: #e8edf6;
+      background: rgba(0, 0, 0, 0.16);
+      border-radius: 16px;
+      border: 1px solid rgba(236, 224, 202, 0.08);
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .workspace {
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow: hidden;
+    }
+
+    .workspace-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 24px;
+    }
+
+    .workspace-status strong {
+      display: block;
+      color: var(--lp-accent);
+      margin-bottom: 5px;
+    }
+
+    .workspace-status span, .telemetry-subtext, .composer-status {
+      color: var(--lp-text-soft);
+      line-height: 1.55;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar .btn { border-radius: 14px; }
+    .toolbar .btn-outline-secondary,
+    .toolbar .form-select {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(236, 224, 202, 0.14);
+      color: var(--lp-text);
+    }
+
+    .select-shell {
+      color-scheme: dark;
+    }
+
+    .select-shell option {
+      background: #132031;
+      color: #eef4fc;
+    }
+
+    body[data-theme="lux"] .select-shell,
+    body[data-theme="flatly"] .select-shell,
+    body[data-theme="sandstone"] .select-shell,
+    body[data-theme="yeti"] .select-shell {
+      color-scheme: light;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--lp-text);
+    }
+
+    body[data-theme="lux"] .select-shell option,
+    body[data-theme="flatly"] .select-shell option,
+    body[data-theme="sandstone"] .select-shell option,
+    body[data-theme="yeti"] .select-shell option {
+      background: #f7f4ee;
+      color: #1b2530;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
+      gap: 16px;
+      padding: 18px;
+      flex: 0 1 auto;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -12% -30% auto;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(214, 182, 109, 0.22), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: clamp(1.7rem, 2.8vw, 2.55rem);
+      line-height: 0.98;
+      font-weight: 700;
+    }
+
+    .hero-copy p {
+      max-width: 58ch;
+      margin: 0;
+      color: var(--lp-text-soft);
+      line-height: 1.52;
+      font-size: 0.92rem;
+    }
+
+    .hero-tags {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-tag, .usage-pill {
+      border: 1px solid rgba(236, 224, 202, 0.14);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--lp-text);
+    }
+
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .telemetry-card {
+      position: relative;
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(236, 224, 202, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      min-height: 104px;
+    }
+
+    .telemetry-card::before {
+      content: "";
       position: absolute;
       inset: 0;
-      z-index: 0;
+      background: linear-gradient(145deg, rgba(214, 182, 109, 0.12), transparent 55%);
+      opacity: 0.9;
       pointer-events: none;
     }
-    /* Logo lateral esquerda fixa */
-    .sidebar-logo {
-      position: fixed;
-      top: 32px;
-      left: 32px;
-      width: 140px;
-      opacity: 0.93;
-      z-index: 50;
-      pointer-events: none;
-      user-select: none;
+
+    .telemetry-card > * { position: relative; z-index: 1; }
+    .telemetry-value {
+      font-size: clamp(1.35rem, 1.9vw, 1.85rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 6px;
     }
-    @media (max-width: 900px) {
-      .sidebar-logo { display: none; }
+
+    .telemetry-subtext { min-height: 0; font-size: 0.82rem; line-height: 1.4; }
+    .token-breakdown {
+      display: flex;
+      gap: 4px;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
+      margin-top: 10px;
+    }
+
+    .token-breakdown span { display: block; height: 100%; }
+    .token-prompt { background: linear-gradient(90deg, rgba(214, 182, 109, 0.95), rgba(214, 182, 109, 0.6)); }
+    .token-completion { background: linear-gradient(90deg, rgba(103, 144, 219, 0.95), rgba(143, 194, 255, 0.75)); }
+
+    .chat-stage {
+      min-height: 0;
+      flex: 1 1 0;
+      overflow: hidden;
+      padding: 18px;
+    }
+    .chat-panel { height: 100%; overflow-y: auto; padding-right: 8px; }
+    .message-stream { display: flex; flex-direction: column; gap: 18px; }
+    .message-row { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 14px; align-items: start; }
+    .message-row.user { grid-template-columns: minmax(0, 1fr) 54px; }
+
+    .message-avatar {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid rgba(236, 224, 202, 0.14);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--lp-text);
+    }
+
+    .message-row.user .message-avatar { order: 2; background: rgba(214, 182, 109, 0.16); color: #ffe6b5; }
+    .message-card {
+      border-radius: 22px;
+      padding: 18px 20px;
+      border: 1px solid rgba(236, 224, 202, 0.1);
+      box-shadow: 0 22px 46px rgba(0, 0, 0, 0.18);
+    }
+
+    .message-assistant { background: var(--lp-assistant); color: var(--lp-assistant-text); }
+    .message-user { background: var(--lp-user); color: var(--lp-text); }
+    .message-row.user .message-card { order: 1; }
+    .message-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .message-time { font-size: 0.78rem; opacity: 0.7; }
+    .message-content { font-size: 0.98rem; line-height: 1.72; word-break: break-word; }
+    .message-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .message-usage { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-copy { border-radius: 12px; font-weight: 700; }
+    .typing-line { display: inline-flex; gap: 6px; align-items: center; }
+    .typing-line span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(34, 48, 66, 0.4);
+      animation: pulse 1.2s infinite ease-in-out;
+    }
+
+    .typing-line span:nth-child(2) { animation-delay: 0.15s; }
+    .typing-line span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes pulse {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.35; }
+      40% { transform: scale(1.05); opacity: 1; }
+    }
+
+    .composer-panel {
+      padding: 18px;
+      flex: 0 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+    .composer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .composer-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .composer-input {
+      min-height: 92px;
+      resize: none;
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(236, 224, 202, 0.14);
+      color: var(--lp-text);
+    }
+
+    .send-btn {
+      min-width: 136px;
+      height: 58px;
+      border: none;
+      border-radius: 18px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, var(--lp-accent-strong), #f1d088);
+      color: #17212f;
+      box-shadow: 0 18px 34px rgba(197, 154, 69, 0.24);
+    }
+
+    .send-btn:disabled { opacity: 0.72; cursor: not-allowed; box-shadow: none; }
+    .empty-history {
+      padding: 24px 16px;
+      border-radius: var(--lp-radius-md);
+      border: 1px dashed rgba(236, 224, 202, 0.16);
+      text-align: center;
+      color: var(--lp-text-soft);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb { background: rgba(214, 182, 109, 0.34); border-radius: 999px; }
+
+    @media (max-width: 1280px) { .hero { grid-template-columns: 1fr; } }
+    @media (max-width: 1024px) {
+      body { overflow: auto; }
+      .app-shell {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+      }
+      .workspace { overflow: visible; }
+      .hero { overflow: visible; }
+      .chat-stage { min-height: 420px; }
+    }
+
+    @media (max-height: 920px) {
+      .app-shell { padding: 14px; gap: 14px; }
+      .sidebar, .workspace-header, .hero, .chat-stage, .composer-panel { padding: 16px; }
+      .workspace { gap: 14px; }
+      .hero { padding: 14px; gap: 12px; }
+      .hero-title {
+        font-size: clamp(1.45rem, 2.2vw, 2rem);
+        margin-bottom: 8px;
+      }
+      .hero-copy p {
+        line-height: 1.42;
+        font-size: 0.84rem;
+      }
+      .hero-tags { margin-top: 10px; }
+      .telemetry-card {
+        min-height: 88px;
+        padding: 11px 12px;
+      }
+      .telemetry-value { font-size: clamp(1.1rem, 1.5vw, 1.45rem); }
+      .telemetry-subtext {
+        min-height: 0;
+        font-size: 0.74rem;
+        line-height: 1.32;
+      }
+      .composer-input {
+        min-height: 76px;
+        padding: 14px 16px;
+      }
+      .send-btn {
+        height: 52px;
+        min-width: 120px;
+      }
+    }
+
+    @media (max-height: 760px) {
+      .workspace-header { padding: 12px 14px; }
+      .hero {
+        padding: 12px;
+        gap: 10px;
+      }
+      .hero-title { font-size: clamp(1.2rem, 1.8vw, 1.6rem); }
+      .hero-copy p {
+        font-size: 0.78rem;
+        line-height: 1.28;
+      }
+      .hero-tag { font-size: 0.68rem; }
+      .telemetry-grid { gap: 8px; }
+      .telemetry-card {
+        min-height: 74px;
+        padding: 9px 10px;
+      }
+      .telemetry-value {
+        font-size: clamp(1rem, 1.2vw, 1.3rem);
+        margin-bottom: 4px;
+      }
+      .telemetry-subtext {
+        font-size: 0.7rem;
+        line-height: 1.24;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-shell { padding: 12px; gap: 14px; }
+      .sidebar, .workspace-header, .hero, .chat-stage, .composer-panel { padding-left: 16px; padding-right: 16px; }
+      .telemetry-grid, .history-summary { grid-template-columns: 1fr; }
+      .workspace-header, .composer-head { align-items: flex-start; }
+      .composer-form { grid-template-columns: 1fr; }
+      .send-btn { width: 100%; }
+      .message-row, .message-row.user { grid-template-columns: 42px minmax(0, 1fr); }
+      .message-row.user .message-avatar, .message-row.user .message-card { order: 0; }
+      .message-avatar { width: 42px; height: 42px; border-radius: 14px; font-size: 0.7rem; }
     }
   </style>
 </head>
-<body class="bg-gradient-to-tr from-slate-200 to-slate-400 min-h-screen flex flex-col items-center font-sans py-0 sm:py-4">
-
-  <!-- Logo lateral esquerda (mantida) -->
-  <img src="logo.png" alt="LexPraxis IA" class="sidebar-logo" />
-
-  <!-- CONTAINER PRINCIPAL -->
-  <div class="w-full max-w-full sm:max-w-6xl rounded-none sm:rounded-3xl overflow-hidden shadow-none sm:shadow-2xl flex flex-col sm:flex-row bg-white/80 border-0 sm:border border-slate-300 h-screen sm:h-[90vh]">
-
-    <!-- CHAT -->
-    <div class="flex flex-col flex-1 h-[60vh] sm:h-full relative">
-      <!-- Marca d’água central -->
-      <div class="chat-watermark"></div>
-
-      <div class="flex justify-end p-2 gap-2 bg-slate-100 border-b border-slate-200 z-10">
-        <button onclick="ajustarFonte(-1)" title="Diminuir texto" class="rounded p-1 px-2 bg-slate-200 hover:bg-slate-300 text-lg font-bold text-slate-700">A-</button>
-        <button onclick="ajustarFonte(1)" title="Aumentar texto" class="rounded p-1 px-2 bg-slate-200 hover:bg-slate-300 text-lg font-bold text-slate-700">A+</button>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar glass-panel">
+      <div class="brand-block">
+        <div class="brand-mark">
+          <img src="logo.png" alt="LexPraxis IA" class="brand-logo" />
+          <div>
+            <div class="eyebrow">Plataforma Forense</div>
+            <h1 class="brand-title">LexPraxis IA</h1>
+            <p class="brand-subtitle">Triagem juridica com historico, contexto e monitoramento de consumo.</p>
+          </div>
+        </div>
+        <span class="status-dot" title="Assistente online"></span>
       </div>
 
-      <div class="flex-1 overflow-y-auto px-2 sm:px-10 py-4 sm:py-8 space-y-5 bg-white/90 z-10" id="chatArea">
-        <div id="messages" class="flex flex-col relative z-10"></div>
+      <div class="sidebar-tools">
+        <label for="filtroHistorico" class="field-label">Filtrar historico</label>
+        <input id="filtroHistorico" type="text" class="form-control input-shell" placeholder="Processo, tese, despacho..." />
+        <button type="button" class="btn btn-outline-danger w-100 logout-btn" onclick="logout()">Encerrar sessao</button>
       </div>
 
-      <form id="messageForm" class="flex items-end gap-2 sm:gap-3 p-2 sm:p-5 bg-slate-100 border-t border-slate-200 z-10">
-        <textarea id="mensagem" placeholder="Digite sua mensagem..." required
-          class="flex-1 resize-none rounded-xl bg-slate-50 text-slate-800 p-3 min-h-[44px] max-h-[120px] outline-none border border-slate-200 focus:border-slate-400 shadow-sm text-base sm:text-lg"></textarea>
-        <button type="submit"
-          class="px-5 py-3 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-400 text-white font-bold shadow-md hover:from-indigo-600 hover:to-blue-500 transition text-base sm:text-lg">
-          Enviar
-        </button>
-      </form>
-    </div>
+      <div class="history-summary">
+        <div>
+          <span class="summary-metric-label">Registros</span>
+          <span class="summary-metric-value" id="historyCount">0</span>
+        </div>
+        <div>
+          <span class="summary-metric-label">Ultima atividade</span>
+          <span class="summary-metric-value" id="historyLastUpdate">Sem consulta</span>
+        </div>
+      </div>
 
-    <!-- HISTÓRICO -->
-    <div class="history-panel flex flex-col w-full sm:w-[350px] h-[40vh] sm:h-full bg-slate-50 border-t sm:border-t-0 sm:border-l border-slate-200">
-      <div class="px-4 sm:px-6 pt-5 sm:pt-7 pb-2 sm:pb-3 border-b border-slate-200 bg-slate-100">
-        <div class="font-semibold text-lg sm:text-lg text-slate-700 text-center">Histórico</div>
-        <input type="text" id="filtroHistorico" placeholder="Filtrar histórico..." 
-               class="mt-3 mb-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-base bg-white focus:ring-2 focus:ring-blue-300 focus:outline-none transition"/>
+      <div class="history-region">
+        <div class="history-head">
+          <h2 class="section-title">Consultas recentes</h2>
+          <span class="muted" id="historyHint">Painel atualizado</span>
+        </div>
+        <div id="history" class="history-list"></div>
       </div>
-      <div class="flex-1 overflow-y-auto px-2 py-2" id="historicoScroll">
-        <div id="history" class="space-y-3"></div>
-      </div>
-      <button class="w-full py-4 text-base font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition" onclick="logout()">
-        Sair
-      </button>
-    </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="workspace-header glass-panel">
+        <div class="workspace-status">
+          <strong>Assistente juridico nacional</strong>
+          <span>Resumo processual, perguntas estrategicas, acompanhamento do DataJud e consumo OpenAI em um unico fluxo.</span>
+        </div>
+        <div class="toolbar">
+          <button type="button" onclick="ajustarFonte(-1)" title="Diminuir texto" class="btn btn-outline-secondary btn-sm">A-</button>
+          <button type="button" onclick="ajustarFonte(1)" title="Aumentar texto" class="btn btn-outline-secondary btn-sm">A+</button>
+          <select id="themeSelector" class="form-select form-select-sm select-shell">
+            <option value="lux">Lux</option>
+            <option value="flatly">Flatly</option>
+            <option value="sandstone">Sandstone</option>
+            <option value="slate">Slate</option>
+            <option value="darkly">Darkly</option>
+            <option value="yeti">Yeti</option>
+          </select>
+        </div>
+      </header>
+
+      <section class="chat-stage glass-panel">
+        <div class="chat-panel" id="chatArea">
+          <div id="messages" class="message-stream"></div>
+        </div>
+      </section>
+
+      <section class="composer-panel glass-panel">
+        <div class="composer-head">
+          <div class="draft-pill" id="draftEstimate">Rascunho estimado: 0 tokens</div>
+          <div class="composer-status" id="composerStatus">Pronto para uma nova consulta ou pergunta juridica.</div>
+        </div>
+        <form id="messageForm" class="composer-form">
+          <textarea id="mensagem" class="form-control composer-input" rows="4" placeholder="Digite o numero do processo, formule a tese ou solicite um resumo tecnico..." required></textarea>
+          <button type="submit" class="send-btn" id="sendButton">Enviar</button>
+        </form>
+      </section>
+    </main>
   </div>
 
-  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="config.js"></script>
   <script>
+    const themeSelector = document.getElementById("themeSelector");
+    const themeStylesheet = document.getElementById("themeStylesheet");
+    const currentTheme = localStorage.getItem("lp_theme") || "lux";
+    applyTheme(currentTheme);
+    themeSelector.value = currentTheme;
+    themeSelector.addEventListener("change", function () {
+      const theme = this.value;
+      localStorage.setItem("lp_theme", theme);
+      themeStylesheet.href = `https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/${theme}/bootstrap.min.css`;
+      applyTheme(theme);
+    });
+
     const usuario_id = getCookie("usuario_id");
-    if (!usuario_id) { window.location.href = "login.html"; }
+    if (!usuario_id) {
+      window.location.href = "login.html";
+    }
 
     const messagesEl = document.getElementById("messages");
     const form = document.getElementById("messageForm");
     const msgInput = document.getElementById("mensagem");
     const historyEl = document.getElementById("history");
     const filtroInput = document.getElementById("filtroHistorico");
+    const sendButton = document.getElementById("sendButton");
+    const composerStatusEl = document.getElementById("composerStatus");
+    const draftEstimateEl = document.getElementById("draftEstimate");
+    const historyCountEl = document.getElementById("historyCount");
+    const historyLastUpdateEl = document.getElementById("historyLastUpdate");
+    const historyHintEl = document.getElementById("historyHint");
+    const historyHoverCard = createHistoryHoverCard();
+    const consultasRestantesEl = document.getElementById("consultasRestantes");
+    const consultasSubtextEl = document.getElementById("consultasSubtext");
+    const sessionTokensEl = document.getElementById("sessionTokens");
+    const sessionSubtextEl = document.getElementById("sessionSubtext");
+    const lastRequestTokensEl = document.getElementById("lastRequestTokens");
+    const lastRequestSubtextEl = document.getElementById("lastRequestSubtext");
+    const liveStatusValueEl = document.getElementById("liveStatusValue");
+    const liveStatusSubtextEl = document.getElementById("liveStatusSubtext");
+    const sessionPromptBarEl = document.getElementById("sessionPromptBar");
+    const sessionCompletionBarEl = document.getElementById("sessionCompletionBar");
+    const lastPromptBarEl = document.getElementById("lastPromptBar");
+    const lastCompletionBarEl = document.getElementById("lastCompletionBar");
+
     let historicoGlobal = [];
-
-    window.addEventListener('DOMContentLoaded', () => {
-      appendMessage(
-        "👋 <b>Olá!</b><br>Sou seu Assistente Jurídico Nacional.<br><br>" +
-        "Informe o número do processo, faça perguntas jurídicas ou peça resumos e informações sobre ações judiciais de qualquer tribunal do Brasil.",
-        "assistant", false
-      );
-      carregarHistorico();
-    });
-
-    form.onsubmit = async (e) => {
-      e.preventDefault();
-      enviarMensagem();
+    let fontSize = 16;
+    let pendingTicker = null;
+    let pendingState = {
+      active: false,
+      startedAt: null,
+      estimatedPromptTokens: 0,
     };
 
-    msgInput.addEventListener('keydown', function(e) {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
+    const dashboardState = {
+      consultasRestantes: null,
+      sessionUsage: defaultUsage(),
+      lastUsage: null,
+      lastModel: null,
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+      appendMessage(
+        "Assistente pronto para apoiar consultas CNJ, pedidos de sintese, leitura de andamento e orientacao tecnica com linguagem adequada ao contencioso.",
+        "assistant",
+        { label: "Boas-vindas", copyable: false }
+      );
+      syncDraftEstimate();
+      carregarHistorico();
+      msgInput.focus();
+    });
+
+    function applyTheme(theme) {
+      document.body.dataset.theme = theme;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await enviarMensagem();
+    });
+
+    msgInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
         form.requestSubmit();
       }
     });
 
-    function enviarMensagem() {
+    msgInput.addEventListener("input", syncDraftEstimate);
+
+    filtroInput.addEventListener("input", function () {
+      const termo = this.value.trim().toLowerCase();
+      const filtrado = historicoGlobal.filter((item) => {
+        const processo = (item.numero_processo || "").toLowerCase();
+        const retorno = (item.retorno_api || "").toLowerCase();
+        return processo.includes(termo) || retorno.includes(termo);
+      });
+      renderHistorico(filtrado);
+    });
+
+    async function enviarMensagem() {
       const mensagem = msgInput.value.trim();
-      if (!mensagem) return;
-      appendMessage(mensagem, "user", false);
-      msgInput.value = "";
-      msgInput.focus();
-      fetch(API_BASE + "chat.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mensagem }),
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.resposta === "Você não possui mais acessos.") {
-          appendMessage("Você não possui mais acessos. Entre em contato: https://wa.me/5592992287144", "assistant", false);
-        } else {
-          appendMessage(data.resposta, "assistant", true);
-        }
-        carregarHistorico();
-      })
-      .catch(() => appendMessage("Erro ao se comunicar com o servidor.", "assistant", false));
-    }
-
-    function appendMessage(text, role, enableCopyBtn = true) {
-      const div = document.createElement("div");
-      div.className =
-        "chat-bubble " +
-        (role === "user"
-          ? "self-end bg-gradient-to-br from-indigo-100 to-blue-50 text-indigo-900 border border-indigo-200"
-          : "self-start bg-white text-slate-900 border border-slate-200") +
-        " max-w-[98%] sm:max-w-[75%] px-4 sm:px-5 py-3 sm:py-4 rounded-2xl shadow text-base whitespace-pre-line mb-2 relative flex flex-col";
-      div.style.alignSelf = (role === "user" ? "flex-end" : "flex-start");
-
-      const textDiv = document.createElement("div");
-      textDiv.innerHTML = text.replace(/\n/g, "<br>");
-      div.appendChild(textDiv);
-
-      if (role === "assistant" && enableCopyBtn) {
-        const copyBtn = document.createElement("button");
-        copyBtn.type = "button";
-        copyBtn.className = "mt-3 px-4 py-2 rounded text-xs sm:text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 transition font-semibold w-fit self-end";
-        copyBtn.innerText = "Copiar";
-        copyBtn.onclick = () => {
-          copiarTexto(text);
-          copyBtn.innerText = "Copiado!";
-          copyBtn.disabled = true;
-          setTimeout(() => {
-            copyBtn.innerText = "Copiar";
-            copyBtn.disabled = false;
-          }, 2000);
-        };
-        div.appendChild(copyBtn);
+      if (!mensagem || pendingState.active) {
+        return;
       }
 
-      messagesEl.appendChild(div);
-      div.scrollIntoView({ behavior: "smooth" });
-    }
+      const estimatedTokens = estimateTokens(mensagem);
+      appendMessage(mensagem, "user", { label: "Solicitacao" });
+      msgInput.value = "";
+      syncDraftEstimate();
+      setPendingState(true, estimatedTokens);
+      composerStatusEl.textContent = "Analise em andamento. O monitor de consumo esta sendo atualizado para esta requisicao.";
+      sendButton.disabled = true;
 
-    function copiarTexto(texto) {
-      const temp = document.createElement("textarea");
-      temp.value = texto.replace(/<br>/g, '\n');
-      document.body.appendChild(temp);
-      temp.select();
-      document.execCommand("copy");
-      document.body.removeChild(temp);
-    }
+      const pendingMessage = appendMessage("", "assistant", {
+        label: "Em processamento",
+        pending: true,
+        copyable: false,
+      });
 
-    function carregarHistorico() {
-      fetch(API_BASE + "historico.php?usuario_id=" + usuario_id)
-        .then(r => r.json())
-        .then(list => {
-          historicoGlobal = list;
-          renderHistorico(list);
+      try {
+        const response = await fetch(API_BASE + "chat.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mensagem }),
         });
+
+        const data = await response.json();
+        finalizePendingMessage(pendingMessage, data.resposta || "Falha ao gerar resposta.", {
+          usage: data.usage || null,
+          model: data.model || null,
+        });
+
+        applyUsagePayload(data);
+        composerStatusEl.textContent = "Resposta concluida. Historico e telemetria foram atualizados.";
+        await carregarHistorico();
+
+        if (!response.ok && !data.resposta) {
+          throw new Error("Resposta invalida do servidor.");
+        }
+      } catch (error) {
+        finalizePendingMessage(pendingMessage, "Erro ao se comunicar com o servidor.");
+        composerStatusEl.textContent = "Nao foi possivel concluir a requisicao. Revise a conectividade do backend.";
+      } finally {
+        setPendingState(false, 0);
+        sendButton.disabled = false;
+        msgInput.focus();
+      }
+    }
+
+    function appendMessage(text, role, options = {}) {
+      const row = document.createElement("article");
+      row.className = `message-row ${role}`;
+
+      const avatar = document.createElement("div");
+      avatar.className = "message-avatar";
+      avatar.textContent = role === "user" ? "EU" : "IA";
+
+      const card = document.createElement("div");
+      card.className = `message-card ${role === "user" ? "message-user" : "message-assistant"}`;
+
+      const meta = document.createElement("div");
+      meta.className = "message-meta";
+
+      const roleLabel = document.createElement("span");
+      roleLabel.className = "message-role";
+      roleLabel.textContent = options.label || (role === "user" ? "Solicitacao" : "Analise");
+
+      const time = document.createElement("span");
+      time.className = "message-time";
+      time.textContent = formatClock(new Date());
+
+      meta.appendChild(roleLabel);
+      meta.appendChild(time);
+
+      const content = document.createElement("div");
+      content.className = "message-content";
+      if (options.pending) {
+        content.innerHTML = `Analisando fundamentos, dados processuais e consumo da requisicao... <span class="typing-line"><span></span><span></span><span></span></span>`;
+      } else {
+        content.innerHTML = escapeHtml(text).replace(/\n/g, "<br>");
+      }
+
+      const footer = document.createElement("div");
+      footer.className = "message-footer";
+
+      const usageWrap = document.createElement("div");
+      usageWrap.className = "message-usage";
+
+      const copySlot = document.createElement("div");
+
+      if (options.usage) {
+        renderUsagePills(usageWrap, options.usage, options.model);
+      }
+
+      if (role === "assistant" && options.copyable !== false && !options.pending) {
+        copySlot.appendChild(createCopyButton(text));
+      }
+
+      if (usageWrap.children.length || copySlot.children.length) {
+        footer.appendChild(usageWrap);
+        footer.appendChild(copySlot);
+      }
+
+      card.appendChild(meta);
+      card.appendChild(content);
+      if (usageWrap.children.length || copySlot.children.length) {
+        card.appendChild(footer);
+      }
+
+      row.appendChild(avatar);
+      row.appendChild(card);
+      messagesEl.appendChild(row);
+      row.scrollIntoView({ behavior: "smooth", block: "end" });
+
+      return { row, card, content, usageWrap, copySlot, roleLabel };
+    }
+
+    function finalizePendingMessage(handle, text, meta = {}) {
+      if (!handle) {
+        return;
+      }
+
+      handle.roleLabel.textContent = "Resposta";
+      handle.content.innerHTML = escapeHtml(text).replace(/\n/g, "<br>");
+      handle.usageWrap.innerHTML = "";
+      handle.copySlot.innerHTML = "";
+
+      if (meta.usage) {
+        renderUsagePills(handle.usageWrap, meta.usage, meta.model);
+      }
+
+      handle.copySlot.appendChild(createCopyButton(text));
+
+      if (!handle.card.querySelector(".message-footer")) {
+        const footer = document.createElement("div");
+        footer.className = "message-footer";
+        footer.appendChild(handle.usageWrap);
+        footer.appendChild(handle.copySlot);
+        handle.card.appendChild(footer);
+      }
+
+      handle.row.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+
+    function createCopyButton(text) {
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "btn btn-sm btn-outline-secondary btn-copy";
+      copyBtn.textContent = "Copiar";
+      copyBtn.addEventListener("click", async () => {
+        await copiarTexto(text);
+        copyBtn.textContent = "Copiado";
+        copyBtn.disabled = true;
+        setTimeout(() => {
+          copyBtn.textContent = "Copiar";
+          copyBtn.disabled = false;
+        }, 1800);
+      });
+      return copyBtn;
+    }
+
+    function renderUsagePills(container, usage, model) {
+      const pills = [];
+      if (model) pills.push(`<span class="usage-pill">${escapeHtml(model)}</span>`);
+      if (typeof usage.prompt_tokens === "number") pills.push(`<span class="usage-pill">Entrada ${formatNumber(usage.prompt_tokens)}</span>`);
+      if (typeof usage.completion_tokens === "number") pills.push(`<span class="usage-pill">Saida ${formatNumber(usage.completion_tokens)}</span>`);
+      if (typeof usage.total_tokens === "number") pills.push(`<span class="usage-pill">Total ${formatNumber(usage.total_tokens)}</span>`);
+      container.innerHTML = pills.join("");
+    }
+
+    async function carregarHistorico() {
+      try {
+        const response = await fetch(API_BASE + "historico.php?usuario_id=" + encodeURIComponent(usuario_id));
+        const payload = await response.json();
+
+        historicoGlobal = Array.isArray(payload.items) ? payload.items : [];
+        renderHistorico(historicoGlobal);
+
+        dashboardState.consultasRestantes = payload.summary?.consultas_restantes ?? dashboardState.consultasRestantes;
+        dashboardState.sessionUsage = payload.summary?.session_usage || dashboardState.sessionUsage;
+        dashboardState.lastModel = payload.summary?.session_usage?.last_model || dashboardState.lastModel;
+        dashboardState.lastUsage = payload.summary?.session_usage?.last_usage || dashboardState.lastUsage;
+
+        historyCountEl.textContent = formatNumber(payload.summary?.historico_count || historicoGlobal.length);
+        historyLastUpdateEl.textContent = payload.summary?.ultima_consulta_em ? formatData(payload.summary.ultima_consulta_em, true) : "Sem consulta";
+        historyHintEl.textContent = historicoGlobal.length ? "Clique para abrir os detalhes" : "Aguardando atividade";
+
+        updateDashboard();
+      } catch (error) {
+        historyEl.innerHTML = `<div class="empty-history">Nao foi possivel carregar o historico.</div>`;
+      }
     }
 
     function renderHistorico(list) {
       historyEl.innerHTML = "";
+      hideHistoryHover();
+
       if (!list.length) {
-        historyEl.innerHTML = "<div class='text-center text-slate-400 py-4'>Sem histórico.</div>";
+        historyEl.innerHTML = `<div class="empty-history">Nenhuma consulta registrada ate o momento.</div>`;
+        historyCountEl.textContent = "0";
+        historyLastUpdateEl.textContent = "Sem consulta";
+        historyHintEl.textContent = "Aguardando atividade";
         return;
       }
-      list.forEach((item, idx) => {
-        const id = "acc" + idx;
-        historyEl.innerHTML += `
-          <div class="bg-white rounded-xl shadow-sm border border-slate-200 group">
-            <button class="flex items-center w-full px-3 sm:px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 transition group-hover:bg-slate-100"
-                    data-bs-toggle="collapse" data-bs-target="#c${id}" aria-expanded="false">
-              <div class="truncate font-medium text-sm text-slate-800">${item.numero_processo || "Consulta"}</div>
-              <div class="ml-2 text-xs text-slate-500">${item.data_hora ? formatData(item.data_hora) : ""}</div>
-              <span class="ml-auto px-2 py-1 bg-indigo-600 text-white rounded font-semibold text-xs">${item.saldo_restante} tokens</span>
-              <svg class="ml-3 w-4 h-4 text-slate-400 group-hover:text-indigo-700 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div id="c${id}" class="hidden px-3 sm:px-5 pb-3 sm:pb-4 pt-1 border-t border-slate-100 accordion-collapse">
-              <div class="relative">
-                <button class="absolute top-0 right-0 text-slate-400 hover:text-red-600 font-bold text-lg px-2 rounded transition"
-                  onclick="excluirHistorico(${item.id}, event)" title="Excluir histórico">&times;</button>
-                <pre class="mt-4 mb-2 text-xs text-slate-800 whitespace-pre-line break-words">${item.retorno_api || ''}</pre>
-                <button class="mt-3 px-4 py-2 rounded text-xs sm:text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 transition font-semibold w-fit"
-                  onclick="copiarTextoHist(event, \`${(item.retorno_api || '').replace(/`/g, '\\`').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}\`)">Copiar</button>
-              </div>
-            </div>
-          </div>`;
-      });
 
-      historyEl.querySelectorAll("button[data-bs-toggle='collapse']").forEach(btn => {
-        btn.onclick = function(e){
-          e.preventDefault();
-          const id = btn.getAttribute("data-bs-target");
-          const el = historyEl.querySelector(id);
-          if (el.classList.contains("hidden")) {
-            historyEl.querySelectorAll(".accordion-collapse").forEach(x=>x.classList.add("hidden"));
-            el.classList.remove("hidden");
-          } else {
-            el.classList.add("hidden");
-          }
-        }
+      list.forEach((item) => {
+        const details = document.createElement("details");
+        details.className = "history-card";
+
+        const summary = document.createElement("summary");
+        const info = document.createElement("div");
+        const processo = item.numero_processo || "Consulta geral";
+        const dataRegistro = item.data_hora ? formatData(item.data_hora) : "Sem data registrada";
+        const retornoPreview = item.retorno_api || "Sem conteudo registrado.";
+        info.innerHTML = `
+          <div class="history-process">${escapeHtml(processo)}</div>
+          <div class="history-date">${escapeHtml(dataRegistro)}</div>
+        `;
+
+        const badge = document.createElement("span");
+        badge.className = "history-badge";
+        badge.textContent = `${typeof item.saldo_restante === "number" ? item.saldo_restante : "--"} consultas`;
+
+        summary.appendChild(info);
+        summary.appendChild(badge);
+
+        const body = document.createElement("div");
+        body.className = "history-body";
+
+        const preview = document.createElement("pre");
+        preview.className = "history-preview";
+        preview.textContent = retornoPreview;
+
+        bindHistoryHover(summary, {
+          processo,
+          data: dataRegistro,
+          retorno: retornoPreview,
+        });
+
+        const actions = document.createElement("div");
+        actions.className = "history-actions";
+        actions.appendChild(createHistoryButton("Copiar", "btn-outline-secondary", async (event, button) => {
+          event.preventDefault();
+          event.stopPropagation();
+          await copiarTexto(item.retorno_api || "");
+          animateHistoryButton(button, "Copiado");
+        }));
+        actions.appendChild(createHistoryButton("Excluir", "btn-outline-danger", async (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          await excluirHistorico(item.id);
+        }));
+
+        body.appendChild(preview);
+        body.appendChild(actions);
+        details.appendChild(summary);
+        details.appendChild(body);
+        historyEl.appendChild(details);
       });
     }
 
-    function copiarTextoHist(e, texto) {
-      e.stopPropagation();
+    function createHistoryHoverCard() {
+      const element = document.createElement("div");
+      element.className = "history-hover-card";
+      document.body.appendChild(element);
+      return element;
+    }
+
+    function bindHistoryHover(target, payload) {
+      target.addEventListener("mouseenter", (event) => showHistoryHover(event, payload));
+      target.addEventListener("mousemove", (event) => moveHistoryHover(event));
+      target.addEventListener("mouseleave", hideHistoryHover);
+      target.addEventListener("blur", hideHistoryHover);
+    }
+
+    function showHistoryHover(event, payload) {
+      historyHoverCard.innerHTML = `
+        <p class="history-hover-title">${escapeHtml(payload.processo)}</p>
+        <p class="history-hover-meta">${escapeHtml(payload.data)}</p>
+        <p class="history-hover-body">${escapeHtml(payload.retorno)}</p>
+      `;
+      historyHoverCard.classList.add("visible");
+      moveHistoryHover(event);
+    }
+
+    function moveHistoryHover(event) {
+      if (!historyHoverCard.classList.contains("visible")) {
+        return;
+      }
+
+      const offset = 18;
+      const cardWidth = historyHoverCard.offsetWidth;
+      const cardHeight = historyHoverCard.offsetHeight;
+      const maxLeft = window.innerWidth - cardWidth - 12;
+      const maxTop = window.innerHeight - cardHeight - 12;
+      const nextLeft = Math.min(event.clientX + offset, Math.max(12, maxLeft));
+      const nextTop = Math.min(event.clientY + offset, Math.max(12, maxTop));
+
+      historyHoverCard.style.left = `${Math.max(12, nextLeft)}px`;
+      historyHoverCard.style.top = `${Math.max(12, nextTop)}px`;
+    }
+
+    function hideHistoryHover() {
+      historyHoverCard.classList.remove("visible");
+    }
+
+    function createHistoryButton(label, className, handler) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `btn btn-sm ${className}`;
+      button.textContent = label;
+      button.addEventListener("click", (event) => handler(event, button));
+      return button;
+    }
+
+    function animateHistoryButton(button, temporaryText) {
+      const original = button.textContent;
+      button.textContent = temporaryText;
+      button.disabled = true;
+      setTimeout(() => {
+        button.textContent = original;
+        button.disabled = false;
+      }, 1800);
+    }
+
+    async function excluirHistorico(id) {
+      try {
+        const response = await fetch(API_BASE + "excluir_historico.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, usuario_id }),
+        });
+
+        if (response.ok) {
+          composerStatusEl.textContent = "Registro removido do historico.";
+          await carregarHistorico();
+        }
+      } catch (error) {
+        composerStatusEl.textContent = "Nao foi possivel excluir o registro selecionado.";
+      }
+    }
+
+    function applyUsagePayload(data) {
+      if (data.session_usage) dashboardState.sessionUsage = data.session_usage;
+      if (data.usage) dashboardState.lastUsage = data.usage;
+      if (data.model) dashboardState.lastModel = data.model;
+      else if (data.session_usage?.last_model) dashboardState.lastModel = data.session_usage.last_model;
+      if (typeof data.consultas_restantes === "number") dashboardState.consultasRestantes = data.consultas_restantes;
+      updateDashboard();
+    }
+
+    function updateDashboard() {
+      const sessionUsage = dashboardState.sessionUsage || defaultUsage();
+      const lastUsage = dashboardState.lastUsage;
+
+      if (consultasRestantesEl) {
+        consultasRestantesEl.textContent = dashboardState.consultasRestantes ?? "--";
+      }
+      if (consultasSubtextEl) {
+        consultasSubtextEl.textContent = dashboardState.consultasRestantes === null
+          ? "Saldo indisponivel no momento."
+          : `${dashboardState.consultasRestantes} ${dashboardState.consultasRestantes === 1 ? "consulta" : "consultas"} de processo ainda ${dashboardState.consultasRestantes === 1 ? "disponivel" : "disponiveis"}.`;
+      }
+
+      if (sessionTokensEl) {
+        sessionTokensEl.textContent = formatNumber(sessionUsage.total_tokens || 0);
+      }
+      if (sessionSubtextEl) {
+        sessionSubtextEl.textContent = (sessionUsage.requests || 0) > 0
+          ? `${sessionUsage.requests} chamada${sessionUsage.requests === 1 ? "" : "s"} confirmada${sessionUsage.requests === 1 ? "" : "s"} nesta sessao. Modelo mais recente: ${sessionUsage.last_model || "nao informado"}.`
+          : "Nenhuma chamada registrada nesta sessao.";
+      }
+      setBreakdownBars(sessionPromptBarEl, sessionCompletionBarEl, sessionUsage.prompt_tokens || 0, sessionUsage.completion_tokens || 0);
+
+      if (lastUsage) {
+        if (lastRequestTokensEl) {
+          lastRequestTokensEl.textContent = formatNumber(lastUsage.total_tokens || 0);
+        }
+        if (lastRequestSubtextEl) {
+          lastRequestSubtextEl.textContent = `Entrada ${formatNumber(lastUsage.prompt_tokens || 0)} | Saida ${formatNumber(lastUsage.completion_tokens || 0)}${dashboardState.lastModel ? ` | ${dashboardState.lastModel}` : ""}`;
+        }
+        setBreakdownBars(lastPromptBarEl, lastCompletionBarEl, lastUsage.prompt_tokens || 0, lastUsage.completion_tokens || 0);
+      } else {
+        if (lastRequestTokensEl) {
+          lastRequestTokensEl.textContent = "0";
+        }
+        if (lastRequestSubtextEl) {
+          lastRequestSubtextEl.textContent = "O ultimo consumo confirmado aparecera aqui assim que a IA responder.";
+        }
+        setBreakdownBars(lastPromptBarEl, lastCompletionBarEl, 0, 0);
+      }
+
+      if (pendingState.active) {
+        const elapsedSeconds = Math.max(1, Math.floor((Date.now() - pendingState.startedAt) / 1000));
+        if (liveStatusValueEl) {
+          liveStatusValueEl.textContent = `${elapsedSeconds}s`;
+        }
+        if (liveStatusSubtextEl) {
+          liveStatusSubtextEl.textContent = `Requisicao em processamento. Estimativa atual de entrada: ${formatNumber(pendingState.estimatedPromptTokens)} tokens.`;
+        }
+      } else {
+        if (liveStatusValueEl) {
+          liveStatusValueEl.textContent = "Pronto";
+        }
+        if (liveStatusSubtextEl) {
+          liveStatusSubtextEl.textContent = `Rascunho atual estimado em ${formatNumber(estimateTokens(msgInput.value))} tokens. O consumo exato aparece assim que a resposta chega.`;
+        }
+      }
+    }
+
+    function setBreakdownBars(promptBar, completionBar, promptTokens, completionTokens) {
+      if (!promptBar || !completionBar) {
+        return;
+      }
+      const total = promptTokens + completionTokens;
+      promptBar.style.width = `${total > 0 ? (promptTokens / total) * 100 : 0}%`;
+      completionBar.style.width = `${total > 0 ? (completionTokens / total) * 100 : 0}%`;
+    }
+
+    function setPendingState(active, estimatedPromptTokens) {
+      pendingState.active = active;
+      pendingState.estimatedPromptTokens = estimatedPromptTokens;
+      pendingState.startedAt = active ? Date.now() : null;
+
+      if (pendingTicker) {
+        clearInterval(pendingTicker);
+        pendingTicker = null;
+      }
+
+      if (active) {
+        pendingTicker = setInterval(updateDashboard, 350);
+      }
+
+      updateDashboard();
+    }
+
+    function syncDraftEstimate() {
+      draftEstimateEl.textContent = `Rascunho estimado: ${formatNumber(estimateTokens(msgInput.value))} tokens`;
+      if (!pendingState.active) updateDashboard();
+    }
+
+    function estimateTokens(text) {
+      const normalized = (text || "").trim();
+      return normalized ? Math.max(1, Math.ceil(normalized.length / 4)) : 0;
+    }
+
+    function defaultUsage() {
+      return {
+        prompt_tokens: 0,
+        completion_tokens: 0,
+        total_tokens: 0,
+        requests: 0,
+        last_model: null,
+        last_usage: null,
+        last_updated_at: null,
+      };
+    }
+
+    async function copiarTexto(texto) {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(texto || "");
+        return;
+      }
       const temp = document.createElement("textarea");
-      temp.value = texto.replace(/<br>/g, '\n');
+      temp.value = texto || "";
       document.body.appendChild(temp);
       temp.select();
       document.execCommand("copy");
       document.body.removeChild(temp);
-      const btn = e.target;
-      const original = btn.innerText;
-      btn.innerText = "Copiado!";
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.innerText = original;
-        btn.disabled = false;
-      }, 2000);
     }
 
-    function formatData(dt) {
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatData(dt, compact = false) {
       if (!dt) return "";
-      const d = new Date(dt.replace(" ", "T"));
-      return d.toLocaleString("pt-BR").replace(",", " às");
+      const date = new Date(dt.replace(" ", "T"));
+      if (Number.isNaN(date.getTime())) return dt;
+      return compact
+        ? date.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+        : date.toLocaleString("pt-BR").replace(",", " as");
+    }
+
+    function formatClock(date) {
+      return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function formatNumber(value) {
+      return Number(value || 0).toLocaleString("pt-BR");
     }
 
     function getCookie(name) {
-      const v = `; ${document.cookie}`;
-      const p = v.split(`; ${name}=`);
-      if (p.length === 2) return p.pop().split(";").shift();
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      return parts.length === 2 ? parts.pop().split(";").shift() : null;
     }
 
     function logout() {
@@ -279,10 +1541,9 @@
       window.location.reload();
     }
 
-    let fontSize = 16;
     function ajustarFonte(delta) {
-      fontSize = Math.max(12, Math.min(28, fontSize + delta));
-      document.documentElement.style.fontSize = fontSize + "px";
+      fontSize = Math.max(13, Math.min(24, fontSize + delta));
+      document.documentElement.style.fontSize = `${fontSize}px`;
     }
   </script>
 </body>

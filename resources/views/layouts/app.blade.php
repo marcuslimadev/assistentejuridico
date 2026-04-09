@@ -5,18 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LexPraxis IA - @yield('title')</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
-    <!-- Bootswatch Darkly -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#2c2f3a">
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("lp_theme") || "darkly";
+            document.write('<link id="themeStylesheet" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/' + savedTheme + '/bootstrap.min.css">');
+        })();
+    </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        body { background: #1a1a2e; }
-        .sidebar { min-height: 100vh; background: #222736; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
-        .sidebar .nav-link { color: #adb5bd; padding: 10px 20px; border-radius: 5px; margin-bottom: 5px; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #375a7f; color: #fff; }
+        body { background: var(--bs-body-bg); }
+        .sidebar { min-height: 100vh; background: var(--bs-tertiary-bg); box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        .sidebar .nav-link { color: var(--bs-secondary-color); padding: 10px 20px; border-radius: 5px; margin-bottom: 5px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: var(--bs-primary); color: #fff; }
         .sidebar-logo { filter: drop-shadow(0 0 10px rgba(55,161,199,0.3)); max-width: 50px; }
-        .topbar { background: #222736; border-bottom: 1px solid #2c2f3a; }
+        .topbar { background: var(--bs-tertiary-bg); border-bottom: 1px solid var(--bs-border-color); }
         .content-area { padding: 20px; }
-        .card { background: #222736; border: 1px solid #2c2f3a; border-radius: 10px; }
+        .card { border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -34,17 +40,37 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('clientes.index') }}" class="nav-link {{ request()->routeIs('clientes.*') ? 'active' : '' }}">
                         <i class="bi bi-people me-2"></i> Clientes
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('processos.index') }}" class="nav-link {{ request()->routeIs('processos.*') ? 'active' : '' }}">
                         <i class="bi bi-folder me-2"></i> Processos
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('agendas.index') }}" class="nav-link {{ request()->routeIs('agendas.*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-event me-2"></i> Agenda
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('prazos.index') }}" class="nav-link {{ request()->routeIs('prazos.*') ? 'active' : '' }}">
+                        <i class="bi bi-clock-history me-2"></i> Prazos
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('tarefas.index') }}" class="nav-link {{ request()->routeIs('tarefas.*') ? 'active' : '' }}">
+                        <i class="bi bi-check2-square me-2"></i> Tarefas
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('documentos.index') }}" class="nav-link {{ request()->routeIs('documentos.*') ? 'active' : '' }}">
+                        <i class="bi bi-file-earmark-text me-2"></i> Documentos
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
                         <i class="bi bi-chat-dots me-2"></i> Chat IA
                     </a>
                 </li>
@@ -54,7 +80,24 @@
         <!-- Main Content -->
         <div class="flex-grow-1 d-flex flex-column" style="width: calc(100% - 250px); overflow-x: hidden;">
             <!-- Topbar -->
-            <header class="topbar p-3 d-flex justify-content-end align-items-center">
+            <header class="topbar p-3 d-flex justify-content-end align-items-center gap-2">
+                <select id="themeSelector" class="form-select form-select-sm" style="width: 170px;">
+                    <option value="darkly">Darkly</option>
+                    <option value="cosmo">Cosmo</option>
+                    <option value="flatly">Flatly</option>
+                    <option value="litera">Litera</option>
+                    <option value="lux">Lux</option>
+                    <option value="materia">Materia</option>
+                    <option value="minty">Minty</option>
+                    <option value="pulse">Pulse</option>
+                    <option value="sandstone">Sandstone</option>
+                    <option value="slate">Slate</option>
+                    <option value="solar">Solar</option>
+                    <option value="superhero">Superhero</option>
+                    <option value="vapor">Vapor</option>
+                    <option value="yeti">Yeti</option>
+                    <option value="zephyr">Zephyr</option>
+                </select>
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person-circle fs-4 me-2"></i>
@@ -82,6 +125,20 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function () {
+            const selector = document.getElementById("themeSelector");
+            const stylesheet = document.getElementById("themeStylesheet");
+            if (!selector || !stylesheet) return;
+            const current = localStorage.getItem("lp_theme") || "darkly";
+            selector.value = current;
+            selector.addEventListener("change", function () {
+                const theme = this.value;
+                localStorage.setItem("lp_theme", theme);
+                stylesheet.href = `https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/${theme}/bootstrap.min.css`;
+            });
+        })();
+    </script>
     @yield('scripts')
 </body>
 </html>

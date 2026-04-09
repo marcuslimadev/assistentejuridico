@@ -1,0 +1,34 @@
+@extends('layouts.app')
+@section('title', 'Agenda')
+@section('content')
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Agenda e Eventos</h2>
+        <a href="{{ route('agendas.create') }}" class="btn btn-primary"><i class="bi bi-calendar-plus me-2"></i>Novo Evento</a>
+    </div>
+    <div class="card p-4 shadow-sm">
+        <p class="text-muted">Módulo de Agenda (Fase 2) estruturado.</p>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr><th>Título</th><th>Data/Hora</th><th>Local</th><th>Status</th><th>Ações</th></tr>
+                </thead>
+                <tbody>
+                    @forelse($agendas as $agenda)
+                        <tr>
+                            <td>{{ $agenda->titulo }} <br><small class="text-info">{{ $agenda->tipo }}</small></td>
+                            <td>{{ \Carbon\Carbon::parse($agenda->data_inicio)->format('d/m/Y H:i') }}</td>
+                            <td>{{ $agenda->local ?? 'Virtual' }}</td>
+                            <td><span class="badge bg-secondary">{{ $agenda->status }}</span></td>
+                            <td><a href="#" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a></td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhum evento encontrado na agenda.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3">{{ $agendas->links('pagination::bootstrap-5') }}</div>
+    </div>
+</div>
+@endsection
