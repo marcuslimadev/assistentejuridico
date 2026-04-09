@@ -113,6 +113,14 @@ function Import-DeployConfig {
   }
 }
 
+function ConvertTo-BashSingleQuoted {
+  param([string]$Value)
+
+  $safeValue = if ($null -eq $Value) { "" } else { [string]$Value }
+  $replacement = ([string][char]39) + ([string][char]34) + ([string][char]39) + ([string][char]34) + ([string][char]39)
+  return ([string][char]39) + $safeValue.Replace([string][char]39, $replacement) + ([string][char]39)
+}
+
 function Invoke-LocalBuild {
   if ($SkipBuild) {
     Write-Step "Skipping local frontend build"
@@ -180,21 +188,34 @@ function Invoke-LocalGitFlow {
 }
 
 function New-RemoteBootstrapScript {
+  $appDir = ConvertTo-BashSingleQuoted $DeployConfig.RemoteAppPath
+  $publicDir = ConvertTo-BashSingleQuoted $DeployConfig.RemotePublicPath
+  $repoUrl = ConvertTo-BashSingleQuoted $DeployConfig.RepoUrl
+  $branchValue = ConvertTo-BashSingleQuoted $Branch
+  $phpBin = ConvertTo-BashSingleQuoted $DeployConfig.PhpBin
+  $composerBin = ConvertTo-BashSingleQuoted $DeployConfig.ComposerBin
+  $appUrl = ConvertTo-BashSingleQuoted $DeployConfig.AppUrl
+  $dbHost = ConvertTo-BashSingleQuoted $DeployConfig.DbHost
+  $dbPort = ConvertTo-BashSingleQuoted $DeployConfig.DbPort
+  $dbDatabase = ConvertTo-BashSingleQuoted $DeployConfig.DbDatabase
+  $dbUsername = ConvertTo-BashSingleQuoted $DeployConfig.DbUsername
+  $dbPassword = ConvertTo-BashSingleQuoted $DeployConfig.DbPassword
+
   return @"
 set -euo pipefail
 
-APP_DIR='$($DeployConfig.RemoteAppPath)'
-PUBLIC_DIR='$($DeployConfig.RemotePublicPath)'
-REPO_URL='$($DeployConfig.RepoUrl)'
-BRANCH='$Branch'
-PHP_BIN='$($DeployConfig.PhpBin)'
-COMPOSER_BIN='$($DeployConfig.ComposerBin)'
-APP_URL='$($DeployConfig.AppUrl)'
-DB_HOST='$($DeployConfig.DbHost)'
-DB_PORT='$($DeployConfig.DbPort)'
-DB_DATABASE='$($DeployConfig.DbDatabase)'
-DB_USERNAME='$($DeployConfig.DbUsername)'
-DB_PASSWORD='$($DeployConfig.DbPassword)'
+APP_DIR=$appDir
+PUBLIC_DIR=$publicDir
+REPO_URL=$repoUrl
+BRANCH=$branchValue
+PHP_BIN=$phpBin
+COMPOSER_BIN=$composerBin
+APP_URL=$appUrl
+DB_HOST=$dbHost
+DB_PORT=$dbPort
+DB_DATABASE=$dbDatabase
+DB_USERNAME=$dbUsername
+DB_PASSWORD=$dbPassword
 
 ensure_env_value() {
   file="`$1"
