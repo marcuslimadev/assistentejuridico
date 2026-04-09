@@ -11,7 +11,7 @@
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center py-8 sm:py-0">
   <div class="w-full max-w-xs sm:max-w-md mx-auto px-2">
     <div class="w-full text-center mt-4">
-      <img src="{{ asset('logo.png') }}" alt="LexPraxis IA" class="mx-auto w-40 sm:w-48 mb-2">
+      <img src="{{ asset('logo.png') }}" alt="LexPraxis IA" class="mx-auto w-80 sm:w-96 mb-2 max-w-full">
     </div>
     <div class="bg-white rounded-2xl shadow-xl px-4 py-8 sm:px-8 sm:py-10 flex flex-col items-center border border-blue-100">
       <div class="w-full flex flex-col items-center mb-4">

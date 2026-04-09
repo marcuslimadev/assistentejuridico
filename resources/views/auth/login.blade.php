@@ -10,7 +10,7 @@
     body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #1a1a2e; }
     .login-card { width: 100%; max-width: 420px; padding: 2.5rem 2rem; }
     .logo-section { text-align: center; margin-bottom: 2rem; }
-    .logo-section img { width: 70px; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(55,161,199,0.4)); }
+    .logo-section img { width: 210px; max-width: 100%; margin-bottom: 1.25rem; filter: drop-shadow(0 0 22px rgba(55,161,199,0.42)); }
     .logo-section h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
     .logo-section p { font-size: 0.9rem; color: #adb5bd; }
     .form-floating .form-control { background-color: #2c2f3a; border-color: #3d4155; color: #e9ecef; }

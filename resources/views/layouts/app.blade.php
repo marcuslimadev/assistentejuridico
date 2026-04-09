@@ -19,7 +19,7 @@
         .sidebar { min-height: 100vh; background: var(--bs-tertiary-bg); box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
         .sidebar .nav-link { color: var(--bs-secondary-color); padding: 10px 20px; border-radius: 5px; margin-bottom: 5px; }
         .sidebar .nav-link:hover, .sidebar .nav-link.active { background: var(--bs-primary); color: #fff; }
-        .sidebar-logo { filter: drop-shadow(0 0 10px rgba(55,161,199,0.3)); max-width: 50px; }
+        .sidebar-logo { filter: drop-shadow(0 0 18px rgba(55,161,199,0.32)); width: 150px; max-width: 100%; }
         .topbar { background: var(--bs-tertiary-bg); border-bottom: 1px solid var(--bs-border-color); }
         .content-area { padding: 20px; }
         .card { border-radius: 10px; }
@@ -29,9 +29,9 @@
     <div class="d-flex">
         <!-- Sidebar -->
         <div class="sidebar d-flex flex-column p-3" style="width: 250px;">
-            <div class="d-flex align-items-center mb-4 text-white text-decoration-none">
+            <div class="d-flex flex-column align-items-start mb-4 text-white text-decoration-none gap-2">
                 <img src="{{ asset('logo.png') }}" alt="Logo" class="sidebar-logo me-2">
-                <span class="fs-5 fw-bold ms-2">LexPraxis IA</span>
+                <span class="fs-5 fw-bold">LexPraxis IA</span>
             </div>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
