@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Cliente extends Model
 {
-    use ClientesSoftDeletes; // Wait, actually I just need `use SoftDeletes;`
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'nome', 'tipo', 'cpf_cnpj', 'rg_ie', 'data_nascimento',
