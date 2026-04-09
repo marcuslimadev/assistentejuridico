@@ -222,9 +222,16 @@ ensure_env_value() {
   key="`$2"
   value="`$3"
 
-  escaped_value=`$(printf '%s' "`$value" | sed 's/[\\/&]/\\\\&/g')
   if grep -q "^`$key=" "`$file"; then
-  sed -i "s/^`$key=.*/`$key=`$escaped_value/" "`$file"
+    temp_file=`$(mktemp)
+    while IFS= read -r line; do
+      if [[ "`$line" == "`$key="* ]]; then
+        printf '%s=%s\n' "`$key" "`$value" >> "`$temp_file"
+      else
+        printf '%s\n' "`$line" >> "`$temp_file"
+      fi
+    done < "`$file"
+    mv "`$temp_file" "`$file"
   else
   printf '\n%s=%s\n' "`$key" "`$value" >> "`$file"
   fi
