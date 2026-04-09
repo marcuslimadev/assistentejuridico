@@ -2,14 +2,17 @@
 @section('title', 'Tarefas')
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Gestão de Tarefas</h2>
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Gestão de Tarefas</h2>
+            <p class="page-subtitle">Leitura mais limpa e compatível com os temas do Bootswatch.</p>
+        </div>
         <a href="{{ route('tarefas.create') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Nova Tarefa</a>
     </div>
-    <div class="card p-4 shadow-sm">
-        <p class="text-muted">Módulo de Tarefas (Fase 2) estruturado.</p>
+    <div class="content-card">
+        <p class="text-body-secondary">Módulo de Tarefas (Fase 2) estruturado.</p>
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle">
+            <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr><th>Título</th><th>Responsável</th><th>Prazo</th><th>Status</th><th>Ações</th></tr>
                 </thead>

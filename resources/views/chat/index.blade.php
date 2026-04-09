@@ -1,23 +1,26 @@
 @extends('layouts.app')
 @section('title', 'Chat IA')
 @section('content')
-<div class="container-fluid h-100 d-flex flex-column" style="min-height: calc(100vh - 100px);">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Assistente Jurídico (IA)</h2>
+<div class="container-fluid h-100 d-flex flex-column" style="min-height: calc(100vh - 180px);">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Assistente Jurídico</h2>
+            <p class="page-subtitle">Converse com a IA sem quebrar o tema visual do restante da plataforma.</p>
+        </div>
     </div>
 
-    <div class="card shadow-sm flex-grow-1 d-flex flex-column overflow-hidden">
-        <div id="chatBox" class="p-4 flex-grow-1 overflow-auto" style="height: 50vh; background: #1a1a2e;">
+    <div class="content-card flex-grow-1 d-flex flex-column overflow-hidden p-0">
+        <div id="chatBox" class="p-4 flex-grow-1 overflow-auto" style="height: 50vh; background: color-mix(in srgb, var(--bs-body-bg) 78%, var(--bs-tertiary-bg) 22%);">
             <div class="d-flex mb-3">
-                <div class="bg-primary text-white p-3 rounded shadow-sm" style="max-width: 75%;">
+                <div class="bg-primary text-white p-3 rounded-4 shadow-sm" style="max-width: 75%;">
                     Olá! Sou seu assistente jurídico com GPT-4o. Como posso ajudar com seus processos hoje?
                 </div>
             </div>
         </div>
-        <div class="p-3 bg-dark border-top border-secondary">
+        <div class="p-3 border-top">
             <form id="chatForm" class="d-flex gap-2">
                 @csrf
-                <input type="text" id="chatInput" class="form-control bg-dark text-light border-secondary" placeholder="Digite sua dúvida ou peça para redigir um documento..." autocomplete="off" required>
+                <input type="text" id="chatInput" class="form-control" placeholder="Digite sua dúvida ou peça para redigir um documento..." autocomplete="off" required>
                 <button type="submit" id="btnSend" class="btn btn-primary px-4"><i class="bi bi-send-fill"></i></button>
             </form>
         </div>
@@ -41,7 +44,7 @@
         // Add User Message
         chatBox.innerHTML += `
             <div class="d-flex justify-content-end mb-3">
-                <div class="bg-secondary text-white p-3 rounded shadow-sm" style="max-width: 75%;">
+                <div class="p-3 rounded-4 shadow-sm border" style="max-width: 75%; background: color-mix(in srgb, var(--bs-primary) 10%, var(--bs-body-bg) 90%); border-color: color-mix(in srgb, var(--bs-primary) 20%, transparent 80%) !important;">
                     ${message}
                 </div>
             </div>`;
@@ -68,14 +71,14 @@
             if (data.reply) {
                 chatBox.innerHTML += `
                     <div class="d-flex mb-3">
-                        <div class="bg-primary text-white p-3 rounded shadow-sm" style="max-width: 75%; white-space: pre-wrap;">
+                        <div class="bg-primary text-white p-3 rounded-4 shadow-sm" style="max-width: 75%; white-space: pre-wrap;">
                             ${data.reply}
                         </div>
                     </div>`;
             } else {
                 chatBox.innerHTML += `
                     <div class="d-flex mb-3">
-                        <div class="bg-danger text-white p-3 rounded shadow-sm" style="max-width: 75%;">
+                        <div class="bg-danger text-white p-3 rounded-4 shadow-sm" style="max-width: 75%;">
                             Erro: ${data.error || 'Falha ao processar.'}
                         </div>
                     </div>`;
@@ -83,7 +86,7 @@
         } catch (error) {
              chatBox.innerHTML += `
                 <div class="d-flex mb-3">
-                    <div class="bg-danger text-white p-3 rounded shadow-sm" style="max-width: 75%;">
+                    <div class="bg-danger text-white p-3 rounded-4 shadow-sm" style="max-width: 75%;">
                         Erro de conexão.
                     </div>
                 </div>`;

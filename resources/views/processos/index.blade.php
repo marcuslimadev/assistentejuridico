@@ -4,8 +4,11 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Gestão de Processos</h2>
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Gestão de Processos</h2>
+            <p class="page-subtitle">Filtros e listagem sem classes presas no escuro, para o tema responder como deveria.</p>
+        </div>
         <a href="{{ route('processos.create') }}" class="btn btn-primary"><i class="bi bi-folder-plus me-2"></i>Novo Processo</a>
     </div>
 
@@ -16,10 +19,10 @@
         </div>
     @endif
 
-    <div class="card p-4 shadow-sm">
-        <form method="GET" action="{{ route('processos.index') }}" class="mb-4 d-flex gap-2 w-75">
-            <input type="text" name="busca" class="form-control bg-dark text-light border-secondary" placeholder="Buscar por cliente ou número CNJ..." value="{{ request('busca') }}">
-            <select name="status" class="form-select bg-dark text-light border-secondary w-auto">
+    <div class="content-card">
+        <form method="GET" action="{{ route('processos.index') }}" class="mb-4 d-flex gap-2 flex-wrap">
+            <input type="text" name="busca" class="form-control" placeholder="Buscar por cliente ou número CNJ..." value="{{ request('busca') }}" style="max-width: 26rem;">
+            <select name="status" class="form-select w-auto">
                 <option value="">Status</option>
                 <option value="em andamento" {{ request('status') == 'em andamento' ? 'selected' : '' }}>Em andamento</option>
                 <option value="arquivado" {{ request('status') == 'arquivado' ? 'selected' : '' }}>Arquivado</option>
@@ -31,7 +34,7 @@
         </form>
 
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle">
+            <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
                         <th>Número CNJ</th>
@@ -49,7 +52,7 @@
                             <td>{{ $processo->cliente->nome ?? 'N/A' }}</td>
                             <td>
                                 <div>{{ $processo->tipo_acao ?: '-' }}</div>
-                                <small class="text-muted">{{ $processo->area_direito ?: '-' }}</small>
+                                <small class="text-body-secondary">{{ $processo->area_direito ?: '-' }}</small>
                             </td>
                             <td><span class="badge bg-secondary text-capitalize">{{ $processo->polo }}</span></td>
                             <td>

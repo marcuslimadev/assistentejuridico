@@ -2,14 +2,17 @@
 @section('title', 'Prazos')
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Controle de Prazos</h2>
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Controle de Prazos</h2>
+            <p class="page-subtitle">Tabelas e alertas agora seguem a base do tema corretamente.</p>
+        </div>
         <a href="{{ route('prazos.create') }}" class="btn btn-primary"><i class="bi bi-clock-history me-2"></i>Registrar Prazo</a>
     </div>
-    <div class="card p-4 shadow-sm">
-        <p class="text-muted">Módulo de Prazos (Fase 2) estruturado.</p>
+    <div class="content-card">
+        <p class="text-body-secondary">Módulo de Prazos (Fase 2) estruturado.</p>
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle">
+            <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr><th>Descrição</th><th>Processo</th><th>Data Fatal</th><th>Status</th><th>Ações</th></tr>
                 </thead>

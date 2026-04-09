@@ -4,8 +4,11 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Gestão de Clientes</h2>
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Gestão de Clientes</h2>
+            <p class="page-subtitle">Visual consistente para busca, tabela e ações em claro ou escuro.</p>
+        </div>
         <a href="{{ route('clientes.create') }}" class="btn btn-primary"><i class="bi bi-person-plus me-2"></i>Novo Cliente</a>
     </div>
 
@@ -16,14 +19,14 @@
         </div>
     @endif
 
-    <div class="card p-4 shadow-sm">
-        <form method="GET" action="{{ route('clientes.index') }}" class="mb-4 d-flex gap-2 w-50">
-            <input type="text" name="busca" class="form-control bg-dark text-light border-secondary" placeholder="Buscar por nome ou CPF/CNPJ..." value="{{ request('busca') }}">
+    <div class="content-card">
+        <form method="GET" action="{{ route('clientes.index') }}" class="mb-4 d-flex gap-2 flex-wrap" style="max-width: 36rem;">
+            <input type="text" name="busca" class="form-control" placeholder="Buscar por nome ou CPF/CNPJ..." value="{{ request('busca') }}">
             <button type="submit" class="btn btn-secondary">Buscar</button>
         </form>
 
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle">
+            <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
                         <th>Nome</th>
@@ -45,7 +48,7 @@
                                 @elseif($cliente->status == 'inativo')
                                     <span class="badge bg-danger">Inativo</span>
                                 @else
-                                    <span class="badge bg-info text-dark">Prospecto</span>
+                                    <span class="badge text-bg-info">Prospecto</span>
                                 @endif
                             </td>
                             <td>
