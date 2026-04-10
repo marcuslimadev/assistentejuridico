@@ -75,7 +75,7 @@ class StripeCheckoutService
 
         if ($paymentMethod === 'boleto') {
             $payload['tax_id_collection'] = [
-                'enabled' => true,
+                'enabled' => 'true',
             ];
             $payload['payment_method_options'] = [
                 'boleto' => [
