@@ -70,7 +70,7 @@
                             <label class="payment-method-option border rounded-3 px-3 py-2">
                                 <input class="form-check-input me-2" type="radio" name="payment_method" value="boleto">
                                 <span class="fw-semibold">Boleto</span>
-                                <span class="text-body-secondary small d-block">A Stripe coleta o CPF/CNPJ e gera o boleto hospedado. Minimo de R$ {{ number_format($boletoMinimumAmountCents / 100, 2, ',', '.') }}.</span>
+                                <span class="text-body-secondary small d-block">A Stripe coleta o CPF/CNPJ e gera o boleto hospedado. Minimo de R$ {{ number_format($boletoMinimumAmountCents / 100, 2, ',', '.') }} ({{ $boletoMinimumCreditsQuantity }} creditos no preco atual).</span>
                             </label>
                         </div>
                     </div>
@@ -85,7 +85,7 @@
                     </div>
                 </form>
 
-                <div id="paymentMethodHint" class="small mt-3 text-body-secondary">Cartao aceita qualquer quantidade minima de 1 credito.</div>
+                <div id="paymentMethodHint" class="small mt-3 text-body-secondary">Cartao aceita qualquer quantidade minima de 1 credito. Boleto exige {{ $boletoMinimumCreditsQuantity }} creditos no preco atual.</div>
                 <div id="purchaseFeedback" class="small mt-2 text-body-secondary">Se o boleto estiver desabilitado no painel da Stripe, a tentativa retornara uma mensagem explicando isso.</div>
 
                 <div id="activePurchasePanel" class="content-card mt-4 p-4 {{ $activePurchase ? '' : 'd-none' }}" data-purchase-id="{{ $activePurchase?->id }}">
@@ -198,9 +198,9 @@
         const paymentMethod = getSelectedPaymentMethod();
 
         if (paymentMethod === 'boleto') {
-            paymentMethodHint.textContent = `Boleto exige valor minimo de ${formatMoney(boletoMinimumAmountCents)}. Se necessario, a quantidade sera ajustada para ${boletoMinimumCreditsQuantity} creditos.`;
+            paymentMethodHint.textContent = `Boleto exige valor minimo de ${formatMoney(boletoMinimumAmountCents)} (${boletoMinimumCreditsQuantity} creditos no preco atual). Se necessario, a quantidade sera ajustada automaticamente.`;
         } else {
-            paymentMethodHint.textContent = 'Cartao aceita qualquer quantidade minima de 1 credito.';
+            paymentMethodHint.textContent = `Cartao aceita qualquer quantidade minima de 1 credito. Para boleto, use pelo menos ${boletoMinimumCreditsQuantity} creditos.`;
         }
     };
 
