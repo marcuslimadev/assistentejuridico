@@ -15,6 +15,7 @@ $PlinkPath = "C:\Program Files\PuTTY\plink.exe"
 $PscpPath = "C:\Program Files\PuTTY\pscp.exe"
 $LocalConfigPath = Join-Path $RepoRoot "deploy.local.psd1"
 $LocalBuildPath = Join-Path $RepoRoot "public\build"
+$LocalEnvPath = Join-Path $RepoRoot ".env"
 $script:BuildAvailable = $false
 
 $DeployConfig = [ordered]@{
@@ -34,6 +35,9 @@ $DeployConfig = [ordered]@{
   DbDatabase       = "u815655858_lexpraxis"
   DbUsername       = "u815655858_lexpraxis"
   DbPassword       = ""
+  GoogleCalendarClientId     = ""
+  GoogleCalendarClientSecret = ""
+  GoogleCalendarId           = "primary"
 }
 
 function Write-Step {
@@ -87,6 +91,24 @@ function Get-GitOutput {
   }
 }
 
+function Get-DotEnvValue {
+  param(
+    [string]$FilePath,
+    [string]$Key
+  )
+
+  if (-not (Test-Path $FilePath)) {
+    return $null
+  }
+
+  $line = Get-Content $FilePath | Where-Object { $_ -match "^$([regex]::Escape($Key))=" } | Select-Object -First 1
+  if (-not $line) {
+    return $null
+  }
+
+  return ($line -split '=', 2)[1].Trim().Trim('"')
+}
+
 function Assert-Prerequisites {
   foreach ($requiredPath in @($PlinkPath, $PscpPath, $LocalConfigPath)) {
     if (-not (Test-Path $requiredPath)) {
@@ -110,6 +132,14 @@ function Import-DeployConfig {
     if ([string]::IsNullOrWhiteSpace($DeployConfig[$requiredKey])) {
       throw "Missing required deploy setting: $requiredKey"
     }
+  }
+
+  $DeployConfig.GoogleCalendarClientId = Get-DotEnvValue -FilePath $LocalEnvPath -Key "GOOGLE_CALENDAR_CLIENT_ID"
+  $DeployConfig.GoogleCalendarClientSecret = Get-DotEnvValue -FilePath $LocalEnvPath -Key "GOOGLE_CALENDAR_CLIENT_SECRET"
+
+  $googleCalendarId = Get-DotEnvValue -FilePath $LocalEnvPath -Key "GOOGLE_CALENDAR_ID"
+  if (-not [string]::IsNullOrWhiteSpace($googleCalendarId)) {
+    $DeployConfig.GoogleCalendarId = $googleCalendarId
   }
 }
 
@@ -200,6 +230,10 @@ function New-RemoteBootstrapScript {
   $dbDatabase = ConvertTo-BashSingleQuoted $DeployConfig.DbDatabase
   $dbUsername = ConvertTo-BashSingleQuoted $DeployConfig.DbUsername
   $dbPassword = ConvertTo-BashSingleQuoted $DeployConfig.DbPassword
+  $googleCalendarClientId = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarClientId
+  $googleCalendarClientSecret = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarClientSecret
+  $googleCalendarId = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarId
+  $googleCalendarRedirect = ConvertTo-BashSingleQuoted ($DeployConfig.AppUrl.TrimEnd('/') + '/google-calendar/callback')
 
   return @"
 set -euo pipefail
@@ -216,6 +250,10 @@ DB_PORT=$dbPort
 DB_DATABASE=$dbDatabase
 DB_USERNAME=$dbUsername
 DB_PASSWORD=$dbPassword
+GOOGLE_CALENDAR_CLIENT_ID=$googleCalendarClientId
+GOOGLE_CALENDAR_CLIENT_SECRET=$googleCalendarClientSecret
+GOOGLE_CALENDAR_REDIRECT_URI=$googleCalendarRedirect
+GOOGLE_CALENDAR_ID=$googleCalendarId
 
 ensure_env_value() {
   file="`$1"
@@ -263,6 +301,10 @@ ensure_env_value .env DB_PORT "`$DB_PORT"
 ensure_env_value .env DB_DATABASE "`$DB_DATABASE"
 ensure_env_value .env DB_USERNAME "`$DB_USERNAME"
 ensure_env_value .env DB_PASSWORD "`$DB_PASSWORD"
+ensure_env_value .env GOOGLE_CALENDAR_CLIENT_ID "`$GOOGLE_CALENDAR_CLIENT_ID"
+ensure_env_value .env GOOGLE_CALENDAR_CLIENT_SECRET "`$GOOGLE_CALENDAR_CLIENT_SECRET"
+ensure_env_value .env GOOGLE_CALENDAR_REDIRECT_URI "`$GOOGLE_CALENDAR_REDIRECT_URI"
+ensure_env_value .env GOOGLE_CALENDAR_ID "`$GOOGLE_CALENDAR_ID"
 
 "`$PHP_BIN" "`$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
