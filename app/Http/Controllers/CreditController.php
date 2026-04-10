@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CreditPurchase;
 use App\Services\ConsultaCreditService;
-use App\Services\MercadoPagoService;
+use App\Services\StripeCheckoutService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use RuntimeException;
@@ -15,7 +15,8 @@ class CreditController extends Controller
     {
         $activePurchase = CreditPurchase::query()
             ->where('user_id', $request->user()->id)
-            ->whereIn('status', ['pending', 'in_process'])
+            ->where('payment_provider', 'stripe')
+            ->where('status', 'pending')
             ->latest()
             ->first();
 
@@ -29,18 +30,18 @@ class CreditController extends Controller
             'activePurchase' => $activePurchase,
             'recentPurchases' => $recentPurchases,
             'consultaUnitPriceCents' => (int) config('services.billing.consulta_unit_price_cents', 5),
-            'mercadoPagoConfigured' => app(MercadoPagoService::class)->isConfigured(),
+            'stripeConfigured' => app(StripeCheckoutService::class)->isConfigured(),
         ]);
     }
 
-    public function store(Request $request, MercadoPagoService $mercadoPagoService): JsonResponse
+    public function store(Request $request, StripeCheckoutService $stripeCheckoutService): JsonResponse
     {
         $validated = $request->validate([
             'credits_quantity' => ['required', 'integer', 'min:1', 'max:5000'],
         ]);
 
         try {
-            $purchase = $mercadoPagoService->createPixPurchase($request->user(), (int) $validated['credits_quantity']);
+            $purchase = $stripeCheckoutService->createPixPurchase($request->user(), (int) $validated['credits_quantity']);
         } catch (RuntimeException $exception) {
             return response()->json([
                 'error' => $exception->getMessage(),
@@ -53,13 +54,13 @@ class CreditController extends Controller
         ]);
     }
 
-    public function show(Request $request, CreditPurchase $purchase, MercadoPagoService $mercadoPagoService, ConsultaCreditService $consultaCreditService): JsonResponse
+    public function show(Request $request, CreditPurchase $purchase, StripeCheckoutService $stripeCheckoutService, ConsultaCreditService $consultaCreditService): JsonResponse
     {
         abort_unless($purchase->user_id === $request->user()->id, 403);
 
-        if (in_array($purchase->status, ['pending', 'in_process'], true)) {
+        if ($purchase->payment_provider === 'stripe' && $purchase->status === 'pending') {
             try {
-                $purchase = $mercadoPagoService->syncPurchase($purchase);
+                $purchase = $stripeCheckoutService->syncPurchase($purchase);
             } catch (RuntimeException) {
             }
         }
@@ -78,6 +79,7 @@ class CreditController extends Controller
     {
         return [
             'id' => $purchase->id,
+            'payment_provider' => $purchase->payment_provider,
             'status' => $purchase->status,
             'credits_quantity' => $purchase->credits_quantity,
             'total_amount_cents' => $purchase->total_amount_cents,

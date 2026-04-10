@@ -159,7 +159,7 @@
             <a href="{{ route('credits.index') }}" class="quick-action-card d-block">
                 <i class="bi bi-qr-code-scan"></i>
                 <div class="fw-bold mb-1">Comprar créditos</div>
-                <div class="text-body-secondary small">Gere Pix instantâneo para repor consultas DataJud em tempo real.</div>
+                <div class="text-body-secondary small">Gere uma cobrança Pix via Stripe para repor consultas DataJud em tempo real.</div>
             </a>
         </div>
     </div>

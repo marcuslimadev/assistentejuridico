@@ -43,10 +43,10 @@
                     <div>
                         <div class="dashboard-kicker"><i class="bi bi-qr-code-scan"></i>Compra via Pix</div>
                         <h5 class="fw-bold mb-1">Gerar cobrança</h5>
-                        <p class="text-body-secondary mb-0">Escolha a quantidade de consultas e pague pelo QR Code do Mercado Pago.</p>
+                        <p class="text-body-secondary mb-0">Escolha a quantidade de consultas e abra a cobrança Pix hospedada pela Stripe.</p>
                     </div>
-                    @if (! $mercadoPagoConfigured)
-                        <span class="badge text-bg-warning">Mercado Pago não configurado</span>
+                    @if (! $stripeConfigured)
+                        <span class="badge text-bg-warning">Stripe não configurada</span>
                     @endif
                 </div>
 
@@ -61,7 +61,7 @@
                         <div class="form-control d-flex align-items-center fw-bold" id="purchaseTotal">R$ 1,00</div>
                     </div>
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary" id="purchaseCreditsButton" {{ $mercadoPagoConfigured ? '' : 'disabled' }}>
+                        <button type="submit" class="btn btn-primary" id="purchaseCreditsButton" {{ $stripeConfigured ? '' : 'disabled' }}>
                             <i class="bi bi-cash-coin me-2"></i>Gerar Pix
                         </button>
                     </div>
@@ -79,15 +79,10 @@
                     </div>
 
                     <div class="row g-4 align-items-start">
-                        <div class="col-lg-4">
-                            <img id="purchaseQrImage" class="img-fluid rounded-4 border {{ $activePurchase?->pix_qr_code_base64 ? '' : 'd-none' }}" src="{{ $activePurchase?->pix_qr_code_base64 ? 'data:image/png;base64,'.$activePurchase->pix_qr_code_base64 : '' }}" alt="QR Code Pix">
-                        </div>
-                        <div class="col-lg-8">
-                            <label class="form-label fw-bold">Código Pix copia e cola</label>
-                            <textarea id="purchaseQrCode" class="form-control" rows="5" readonly>{{ $activePurchase?->pix_qr_code }}</textarea>
+                        <div class="col-12">
+                            <p class="text-body-secondary mb-3" id="purchaseInstructionsText">A Stripe abrirá uma tela segura para seleção do Pix e exibição do QR Code. Use o botão abaixo para continuar a cobrança.</p>
                             <div class="d-flex flex-wrap gap-2 mt-3">
-                                <button type="button" class="btn btn-outline-primary" id="copyPixCodeButton">Copiar código Pix</button>
-                                <a href="{{ $activePurchase?->ticket_url ?: '#' }}" target="_blank" id="openTicketButton" class="btn btn-outline-secondary {{ $activePurchase?->ticket_url ? '' : 'd-none' }}">Abrir cobrança</a>
+                                <a href="{{ $activePurchase?->ticket_url ?: '#' }}" target="_blank" id="openTicketButton" class="btn btn-primary {{ $activePurchase?->ticket_url ? '' : 'd-none' }}">Abrir cobrança na Stripe</a>
                             </div>
                             <div class="small text-body-secondary mt-3" id="purchaseApprovedMessage"></div>
                         </div>
@@ -151,11 +146,8 @@
     const activePurchasePanel = document.getElementById('activePurchasePanel');
     const purchaseStatusText = document.getElementById('purchaseStatusText');
     const purchaseCreditsText = document.getElementById('purchaseCreditsText');
-    const purchaseQrImage = document.getElementById('purchaseQrImage');
-    const purchaseQrCode = document.getElementById('purchaseQrCode');
     const openTicketButton = document.getElementById('openTicketButton');
     const approvedMessage = document.getElementById('purchaseApprovedMessage');
-    const copyPixCodeButton = document.getElementById('copyPixCodeButton');
 
     let purchasePollTimer = null;
 
@@ -177,13 +169,7 @@
         activePurchasePanel.dataset.purchaseId = purchase.id;
         purchaseStatusText.textContent = purchase.status;
         purchaseCreditsText.textContent = `${purchase.credits_quantity} crédito(s)`;
-        purchaseQrCode.value = purchase.pix_qr_code || '';
         balanceValue.textContent = creditsBalance;
-
-        if (purchase.pix_qr_code_base64) {
-            purchaseQrImage.src = `data:image/png;base64,${purchase.pix_qr_code_base64}`;
-            purchaseQrImage.classList.remove('d-none');
-        }
 
         if (purchase.ticket_url) {
             openTicketButton.href = purchase.ticket_url;
@@ -193,8 +179,11 @@
         if (purchase.status === 'approved' && purchase.credited_at) {
             approvedMessage.textContent = 'Pagamento aprovado e créditos liberados em tempo real.';
             stopPolling();
+        } else if (purchase.status === 'expired' || purchase.status === 'failed') {
+            approvedMessage.textContent = 'A cobrança Pix expirou ou falhou. Gere uma nova cobrança para continuar.';
+            stopPolling();
         } else {
-            approvedMessage.textContent = 'Aguardando aprovação do Pix pelo Mercado Pago.';
+            approvedMessage.textContent = 'Aguardando pagamento Pix na Stripe.';
             startPolling();
         }
     };
@@ -234,15 +223,6 @@
     quantityInput.addEventListener('input', updateTotal);
     updateTotal();
 
-    copyPixCodeButton?.addEventListener('click', async function () {
-        if (!purchaseQrCode.value) {
-            return;
-        }
-
-        await navigator.clipboard.writeText(purchaseQrCode.value);
-        feedback.textContent = 'Código Pix copiado.';
-    });
-
     purchaseForm.addEventListener('submit', async function (event) {
         event.preventDefault();
         feedback.textContent = '';
@@ -262,7 +242,7 @@
                 feedback.textContent = data.error || 'Não foi possível gerar a cobrança.';
             } else {
                 renderPurchase(data.purchase, data.credits_balance);
-                feedback.textContent = 'Cobrança Pix gerada com sucesso.';
+                feedback.textContent = 'Cobrança Pix gerada com sucesso. Abra a Stripe para concluir o pagamento.';
             }
         } catch (error) {
             feedback.textContent = 'Falha de conexão ao gerar a cobrança.';

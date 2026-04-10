@@ -38,8 +38,11 @@ $DeployConfig = [ordered]@{
   DbPassword       = ""
   OpenAIApiKey               = ""
   DataJudKey                 = ""
-  MercadoPagoAccessToken     = ""
-  MercadoPagoWebhookSecret   = ""
+  StripePublishableKey       = ""
+  StripeSecretKey            = ""
+  StripeWebhookSecret        = ""
+  StripeSuccessUrl           = ""
+  StripeCancelUrl            = ""
   ConsultaUnitPriceCents     = "5"
   GoogleCalendarClientId     = ""
   GoogleCalendarClientSecret = ""
@@ -145,8 +148,11 @@ function Import-DeployConfig {
   if ([string]::IsNullOrWhiteSpace($DeployConfig.DataJudKey)) {
     $DeployConfig.DataJudKey = Get-DotEnvValue -FilePath $LocalLegacyBackendEnvPath -Key "DATAJUD_KEY"
   }
-  $DeployConfig.MercadoPagoAccessToken = Get-DotEnvValue -FilePath $LocalEnvPath -Key "MERCADO_PAGO_ACCESS_TOKEN"
-  $DeployConfig.MercadoPagoWebhookSecret = Get-DotEnvValue -FilePath $LocalEnvPath -Key "MERCADO_PAGO_WEBHOOK_SECRET"
+  $DeployConfig.StripePublishableKey = Get-DotEnvValue -FilePath $LocalEnvPath -Key "STRIPE_PUBLISHABLE_KEY"
+  $DeployConfig.StripeSecretKey = Get-DotEnvValue -FilePath $LocalEnvPath -Key "STRIPE_SECRET_KEY"
+  $DeployConfig.StripeWebhookSecret = Get-DotEnvValue -FilePath $LocalEnvPath -Key "STRIPE_WEBHOOK_SECRET"
+  $DeployConfig.StripeSuccessUrl = Get-DotEnvValue -FilePath $LocalEnvPath -Key "STRIPE_SUCCESS_URL"
+  $DeployConfig.StripeCancelUrl = Get-DotEnvValue -FilePath $LocalEnvPath -Key "STRIPE_CANCEL_URL"
 
   $consultaUnitPriceCents = Get-DotEnvValue -FilePath $LocalEnvPath -Key "CONSULTA_UNIT_PRICE_CENTS"
   if (-not [string]::IsNullOrWhiteSpace($consultaUnitPriceCents)) {
@@ -250,8 +256,11 @@ function New-RemoteBootstrapScript {
   $dbPassword = ConvertTo-BashSingleQuoted $DeployConfig.DbPassword
   $openAIApiKey = ConvertTo-BashSingleQuoted $DeployConfig.OpenAIApiKey
   $dataJudKey = ConvertTo-BashSingleQuoted $DeployConfig.DataJudKey
-  $mercadoPagoAccessToken = ConvertTo-BashSingleQuoted $DeployConfig.MercadoPagoAccessToken
-  $mercadoPagoWebhookSecret = ConvertTo-BashSingleQuoted $DeployConfig.MercadoPagoWebhookSecret
+  $stripePublishableKey = ConvertTo-BashSingleQuoted $DeployConfig.StripePublishableKey
+  $stripeSecretKey = ConvertTo-BashSingleQuoted $DeployConfig.StripeSecretKey
+  $stripeWebhookSecret = ConvertTo-BashSingleQuoted $DeployConfig.StripeWebhookSecret
+  $stripeSuccessUrl = ConvertTo-BashSingleQuoted $DeployConfig.StripeSuccessUrl
+  $stripeCancelUrl = ConvertTo-BashSingleQuoted $DeployConfig.StripeCancelUrl
   $consultaUnitPriceCents = ConvertTo-BashSingleQuoted $DeployConfig.ConsultaUnitPriceCents
   $googleCalendarClientId = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarClientId
   $googleCalendarClientSecret = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarClientSecret
@@ -275,8 +284,11 @@ DB_USERNAME=$dbUsername
 DB_PASSWORD=$dbPassword
 OPENAI_API_KEY=$openAIApiKey
 DATAJUD_KEY=$dataJudKey
-MERCADO_PAGO_ACCESS_TOKEN=$mercadoPagoAccessToken
-MERCADO_PAGO_WEBHOOK_SECRET=$mercadoPagoWebhookSecret
+STRIPE_PUBLISHABLE_KEY=$stripePublishableKey
+STRIPE_SECRET_KEY=$stripeSecretKey
+STRIPE_WEBHOOK_SECRET=$stripeWebhookSecret
+STRIPE_SUCCESS_URL=$stripeSuccessUrl
+STRIPE_CANCEL_URL=$stripeCancelUrl
 CONSULTA_UNIT_PRICE_CENTS=$consultaUnitPriceCents
 GOOGLE_CALENDAR_CLIENT_ID=$googleCalendarClientId
 GOOGLE_CALENDAR_CLIENT_SECRET=$googleCalendarClientSecret
@@ -331,8 +343,11 @@ ensure_env_value .env DB_USERNAME "`$DB_USERNAME"
 ensure_env_value .env DB_PASSWORD "`$DB_PASSWORD"
 ensure_env_value .env OPENAI_API_KEY "`$OPENAI_API_KEY"
 ensure_env_value .env DATAJUD_KEY "`$DATAJUD_KEY"
-ensure_env_value .env MERCADO_PAGO_ACCESS_TOKEN "`$MERCADO_PAGO_ACCESS_TOKEN"
-ensure_env_value .env MERCADO_PAGO_WEBHOOK_SECRET "`$MERCADO_PAGO_WEBHOOK_SECRET"
+ensure_env_value .env STRIPE_PUBLISHABLE_KEY "`$STRIPE_PUBLISHABLE_KEY"
+ensure_env_value .env STRIPE_SECRET_KEY "`$STRIPE_SECRET_KEY"
+ensure_env_value .env STRIPE_WEBHOOK_SECRET "`$STRIPE_WEBHOOK_SECRET"
+ensure_env_value .env STRIPE_SUCCESS_URL "`$STRIPE_SUCCESS_URL"
+ensure_env_value .env STRIPE_CANCEL_URL "`$STRIPE_CANCEL_URL"
 ensure_env_value .env CONSULTA_UNIT_PRICE_CENTS "`$CONSULTA_UNIT_PRICE_CENTS"
 ensure_env_value .env GOOGLE_CALENDAR_CLIENT_ID "`$GOOGLE_CALENDAR_CLIENT_ID"
 ensure_env_value .env GOOGLE_CALENDAR_CLIENT_SECRET "`$GOOGLE_CALENDAR_CLIENT_SECRET"

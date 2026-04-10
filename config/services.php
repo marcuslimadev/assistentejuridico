@@ -50,10 +50,12 @@ return [
         'api_key' => env('DATAJUD_KEY'),
     ],
 
-    'mercado_pago' => [
-        'access_token' => env('MERCADO_PAGO_ACCESS_TOKEN'),
-        'webhook_secret' => env('MERCADO_PAGO_WEBHOOK_SECRET'),
-        'notification_url' => env('MERCADO_PAGO_NOTIFICATION_URL', rtrim((string) env('APP_URL'), '/').'/webhooks/mercado-pago'),
+    'stripe' => [
+        'publishable_key' => env('STRIPE_PUBLISHABLE_KEY'),
+        'secret_key' => env('STRIPE_SECRET_KEY'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+        'success_url' => env('STRIPE_SUCCESS_URL', rtrim((string) env('APP_URL'), '/').'/creditos?pagamento=sucesso'),
+        'cancel_url' => env('STRIPE_CANCEL_URL', rtrim((string) env('APP_URL'), '/').'/creditos?pagamento=cancelado'),
     ],
 
     'billing' => [

@@ -28,11 +28,11 @@ use App\Http\Controllers\DocTemplateController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\CreditController;
-use App\Http\Controllers\MercadoPagoWebhookController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\PortalController;
 
-Route::post('/webhooks/mercado-pago', MercadoPagoWebhookController::class)->name('webhooks.mercado-pago');
+Route::post('/webhooks/stripe', StripeWebhookController::class)->name('webhooks.stripe');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

@@ -11,8 +11,10 @@ class CreditPurchase extends Model
 
     protected $fillable = [
         'user_id',
+        'payment_provider',
         'external_reference',
-        'mercado_pago_payment_id',
+        'provider_session_id',
+        'provider_payment_id',
         'status',
         'credits_quantity',
         'unit_price_cents',

@@ -77,7 +77,7 @@
                 <div class="chat-kicker"><i class="bi bi-cash-coin"></i>Créditos</div>
                 <h6 class="fw-bold mb-2">Consulta DataJud custa 1 crédito</h6>
                 <p class="text-body-secondary small mb-3">Saldo atual: <strong id="chatCreditsBalanceSide">{{ auth()->user()->consulta_credits }}</strong> crédito(s).</p>
-                <a href="{{ route('credits.index') }}" class="btn btn-outline-primary w-100">Comprar créditos via Pix</a>
+                <a href="{{ route('credits.index') }}" class="btn btn-outline-primary w-100">Comprar créditos via Stripe</a>
             </div>
             <div class="chat-side-card">
                 <div class="chat-kicker"><i class="bi bi-lightning-charge"></i>Atalhos</div>
