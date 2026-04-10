@@ -194,6 +194,11 @@
           Não tem conta?
           <a href="{{ route('register') }}" class="fw-semibold text-decoration-none">Registre-se</a>
         </p>
+        <div class="d-flex justify-content-center flex-wrap gap-3 mt-4 small text-body-secondary">
+          <a href="{{ route('home') }}" class="text-decoration-none fw-semibold">Página inicial</a>
+          <a href="{{ route('legal.privacy') }}" class="text-decoration-none fw-semibold">Política de Privacidade</a>
+          <a href="{{ route('legal.terms') }}" class="text-decoration-none fw-semibold">Termos de Serviço</a>
+        </div>
       </div>
     </div>
   </div>

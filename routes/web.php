@@ -3,9 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+Route::view('/', 'welcome')->name('home');
 
 Route::view('/politica-de-privacidade', 'legal.privacy')->name('legal.privacy');
 Route::view('/termos-de-servico', 'legal.terms')->name('legal.terms');
