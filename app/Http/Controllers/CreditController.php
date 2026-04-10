@@ -30,6 +30,8 @@ class CreditController extends Controller
             'activePurchase' => $activePurchase,
             'recentPurchases' => $recentPurchases,
             'consultaUnitPriceCents' => (int) config('services.billing.consulta_unit_price_cents', 5),
+            'boletoMinimumAmountCents' => 500,
+            'boletoMinimumCreditsQuantity' => max(1, (int) ceil(500 / max(1, (int) config('services.billing.consulta_unit_price_cents', 5)))),
             'stripeConfigured' => app(StripeCheckoutService::class)->isConfigured(),
         ]);
     }

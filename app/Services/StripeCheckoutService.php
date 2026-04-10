@@ -14,6 +14,7 @@ use RuntimeException;
 class StripeCheckoutService
 {
     protected const SUPPORTED_PAYMENT_METHODS = ['card', 'boleto'];
+    protected const BOLETO_MINIMUM_AMOUNT_CENTS = 500;
 
     public function isConfigured(): bool
     {
@@ -35,7 +36,12 @@ class StripeCheckoutService
         }
 
         $unitPriceCents = (int) config('services.billing.consulta_unit_price_cents', 5);
+        $totalAmountCents = $creditsQuantity * $unitPriceCents;
         $externalReference = (string) Str::uuid();
+
+        if ($paymentMethod === 'boleto' && $totalAmountCents < self::BOLETO_MINIMUM_AMOUNT_CENTS) {
+            throw new RuntimeException('Boleto disponivel apenas para compras a partir de R$ 5,00. Aumente a quantidade de creditos e tente novamente.');
+        }
 
         $payload = [
             'mode' => 'payment',
@@ -112,7 +118,7 @@ class StripeCheckoutService
             'status' => $this->mapCheckoutStatus($payload['status'] ?? null, $payload['payment_status'] ?? null),
             'credits_quantity' => $creditsQuantity,
             'unit_price_cents' => $unitPriceCents,
-            'total_amount_cents' => $creditsQuantity * $unitPriceCents,
+            'total_amount_cents' => $totalAmountCents,
             'payer_email' => $user->email,
             'ticket_url' => $payload['url'] ?? null,
             'payment_payload' => $payload,

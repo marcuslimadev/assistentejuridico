@@ -7,6 +7,8 @@
     class="container-fluid"
     id="creditsPage"
     data-unit-price-cents="{{ $consultaUnitPriceCents }}"
+    data-boleto-minimum-amount-cents="{{ $boletoMinimumAmountCents }}"
+    data-boleto-minimum-credits-quantity="{{ $boletoMinimumCreditsQuantity }}"
     data-credits-base-url="{{ url('/creditos') }}"
     data-credits-store-url="{{ route('credits.store') }}"
     data-active-payment-method="{{ data_get($activePurchase?->payment_payload, 'metadata.payment_method', 'card') }}"
@@ -68,7 +70,7 @@
                             <label class="payment-method-option border rounded-3 px-3 py-2">
                                 <input class="form-check-input me-2" type="radio" name="payment_method" value="boleto">
                                 <span class="fw-semibold">Boleto</span>
-                                <span class="text-body-secondary small d-block">A Stripe coleta o CPF/CNPJ e gera o boleto hospedado.</span>
+                                <span class="text-body-secondary small d-block">A Stripe coleta o CPF/CNPJ e gera o boleto hospedado. Minimo de R$ {{ number_format($boletoMinimumAmountCents / 100, 2, ',', '.') }}.</span>
                             </label>
                         </div>
                     </div>
@@ -83,7 +85,8 @@
                     </div>
                 </form>
 
-                <div id="purchaseFeedback" class="small mt-3 text-body-secondary">Se o boleto estiver desabilitado no painel da Stripe, a tentativa retornara uma mensagem explicando isso.</div>
+                <div id="paymentMethodHint" class="small mt-3 text-body-secondary">Cartao aceita qualquer quantidade minima de 1 credito.</div>
+                <div id="purchaseFeedback" class="small mt-2 text-body-secondary">Se o boleto estiver desabilitado no painel da Stripe, a tentativa retornara uma mensagem explicando isso.</div>
 
                 <div id="activePurchasePanel" class="content-card mt-4 p-4 {{ $activePurchase ? '' : 'd-none' }}" data-purchase-id="{{ $activePurchase?->id }}">
                     <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
@@ -156,12 +159,16 @@
 <script>
     const creditsPage = document.getElementById('creditsPage');
     const unitPriceCents = Number(creditsPage.dataset.unitPriceCents || 5);
+    const boletoMinimumAmountCents = Number(creditsPage.dataset.boletoMinimumAmountCents || 500);
+    const boletoMinimumCreditsQuantity = Number(creditsPage.dataset.boletoMinimumCreditsQuantity || 100);
     const creditsBaseUrl = creditsPage.dataset.creditsBaseUrl;
     const creditsStoreUrl = creditsPage.dataset.creditsStoreUrl;
     const quantityInput = document.getElementById('creditsQuantity');
+    const paymentMethodInputs = Array.from(document.querySelectorAll('input[name="payment_method"]'));
     const totalDisplay = document.getElementById('purchaseTotal');
     const purchaseForm = document.getElementById('purchaseCreditsForm');
     const purchaseButton = document.getElementById('purchaseCreditsButton');
+    const paymentMethodHint = document.getElementById('paymentMethodHint');
     const feedback = document.getElementById('purchaseFeedback');
     const balanceValue = document.getElementById('creditsBalanceValue');
     const activePurchasePanel = document.getElementById('activePurchasePanel');
@@ -180,6 +187,33 @@
 
     const formatPaymentMethod = function (paymentMethod) {
         return paymentMethod === 'boleto' ? 'Boleto' : 'Cartao de credito';
+    };
+
+    const getSelectedPaymentMethod = function () {
+        const selectedInput = paymentMethodInputs.find((input) => input.checked);
+        return selectedInput ? selectedInput.value : 'card';
+    };
+
+    const updatePaymentMethodHint = function () {
+        const paymentMethod = getSelectedPaymentMethod();
+
+        if (paymentMethod === 'boleto') {
+            paymentMethodHint.textContent = `Boleto exige valor minimo de ${formatMoney(boletoMinimumAmountCents)}. Se necessario, a quantidade sera ajustada para ${boletoMinimumCreditsQuantity} creditos.`;
+        } else {
+            paymentMethodHint.textContent = 'Cartao aceita qualquer quantidade minima de 1 credito.';
+        }
+    };
+
+    const enforceSelectedPaymentMethodRules = function () {
+        if (getSelectedPaymentMethod() === 'boleto') {
+            const currentQuantity = Math.max(1, Number(quantityInput.value || 0));
+            if (currentQuantity < boletoMinimumCreditsQuantity) {
+                quantityInput.value = boletoMinimumCreditsQuantity;
+            }
+        }
+
+        updateTotal();
+        updatePaymentMethodHint();
     };
 
     const updateTotal = function () {
@@ -256,7 +290,10 @@
     };
 
     quantityInput.addEventListener('input', updateTotal);
-    updateTotal();
+    paymentMethodInputs.forEach((input) => {
+        input.addEventListener('change', enforceSelectedPaymentMethodRules);
+    });
+    enforceSelectedPaymentMethodRules();
 
     purchaseForm.addEventListener('submit', async function (event) {
         event.preventDefault();
