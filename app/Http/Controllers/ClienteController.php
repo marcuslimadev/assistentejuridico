@@ -36,7 +36,18 @@ class ClienteController extends Controller
             'status' => 'required|in:ativo,inativo,prospecto'
         ]);
 
-        Cliente::create($validated);
+        $cliente = Cliente::create($validated);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Cliente cadastrado com sucesso!',
+                'cliente' => [
+                    'id' => $cliente->id,
+                    'nome' => $cliente->nome,
+                    'cpf_cnpj' => $cliente->cpf_cnpj,
+                ],
+            ], 201);
+        }
 
         return redirect()->route('clientes.index')->with('success', 'Cliente cadastrado com sucesso!');
     }

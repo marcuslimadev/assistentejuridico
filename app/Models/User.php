@@ -23,6 +23,11 @@ class User extends Authenticatable
         'email',
         'password',
         'celular',
+        'google_calendar_token',
+        'google_calendar_refresh_token',
+        'google_calendar_token_expires_at',
+        'google_calendar_calendar_id',
+        'google_calendar_connected_at',
     ];
 
     /**
@@ -33,6 +38,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'google_calendar_token',
+        'google_calendar_refresh_token',
     ];
 
     /**
@@ -45,6 +52,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'google_calendar_token' => 'encrypted:array',
+            'google_calendar_refresh_token' => 'encrypted',
+            'google_calendar_token_expires_at' => 'datetime',
+            'google_calendar_connected_at' => 'datetime',
         ];
     }
 }

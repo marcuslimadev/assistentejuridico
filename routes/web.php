@@ -7,6 +7,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::view('/politica-de-privacidade', 'legal.privacy')->name('legal.privacy');
+Route::view('/termos-de-servico', 'legal.terms')->name('legal.terms');
+
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -25,6 +28,7 @@ use App\Http\Controllers\DespesaController;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\DocTemplateController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\PortalController;
 
@@ -40,6 +44,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('despesas', DespesaController::class);
     Route::resource('documentos', DocumentoController::class);
     Route::resource('doc-templates', DocTemplateController::class);
+    Route::get('/google-calendar/connect', [GoogleCalendarController::class, 'redirect'])->name('google-calendar.redirect');
+    Route::get('/google-calendar/callback', [GoogleCalendarController::class, 'callback'])->name('google-calendar.callback');
+    Route::delete('/google-calendar/disconnect', [GoogleCalendarController::class, 'destroy'])->name('google-calendar.destroy');
     
     // Chat AI
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');

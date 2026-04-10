@@ -23,12 +23,18 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label">Cliente <span class="text-danger">*</span></label>
-                    <select name="cliente_id" class="form-select" required>
-                        <option value="">Selecione um cliente...</option>
-                        @foreach($clientes as $cliente)
-                            <option value="{{ $cliente->id }}" {{ old('cliente_id') == $cliente->id ? 'selected' : '' }}>{{ $cliente->nome }} ({{ $cliente->cpf_cnpj ?: 'Sem documento' }})</option>
-                        @endforeach
-                    </select>
+                    <div class="d-flex gap-2 align-items-start flex-wrap">
+                        <select name="cliente_id" id="clienteSelect" class="form-select" required>
+                            <option value="">Selecione um cliente...</option>
+                            @foreach($clientes as $cliente)
+                                <option value="{{ $cliente->id }}" {{ old('cliente_id') == $cliente->id ? 'selected' : '' }}>{{ $cliente->nome }} ({{ $cliente->cpf_cnpj ?: 'Sem documento' }})</option>
+                            @endforeach
+                        </select>
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#quickClientModal">
+                            <i class="bi bi-person-plus"></i>
+                        </button>
+                    </div>
+                    <div class="text-body-secondary small mt-2">Cadastre um cliente sem sair desta tela.</div>
                     @error('cliente_id') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
                 <div class="col-md-6">
@@ -117,4 +123,145 @@
         </form>
     </div>
 </div>
+
+<div class="modal fade" id="quickClientModal" tabindex="-1" aria-labelledby="quickClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <h5 class="modal-title fw-bold" id="quickClientModalLabel">Cadastrar cliente rapidamente</h5>
+                    <p class="text-body-secondary mb-0 small">Crie o cliente e continue o cadastro do processo sem trocar de tela.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <div id="quickClientAlert" class="alert d-none" role="alert"></div>
+                <form id="quickClientForm" class="row g-3">
+                    @csrf
+                    <div class="col-md-8">
+                        <label class="form-label">Nome completo / razão social <span class="text-danger">*</span></label>
+                        <input type="text" name="nome" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo <span class="text-danger">*</span></label>
+                        <select name="tipo" class="form-select" required>
+                            <option value="PF">Pessoa Física</option>
+                            <option value="PJ">Pessoa Jurídica</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">CPF / CNPJ</label>
+                        <input type="text" name="cpf_cnpj" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Status <span class="text-danger">*</span></label>
+                        <select name="status" class="form-select" required>
+                            <option value="ativo">Ativo</option>
+                            <option value="prospecto">Prospecto</option>
+                            <option value="inativo">Inativo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">E-mail</label>
+                        <input type="email" name="email" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Celular</label>
+                        <input type="text" name="celular" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="quickClientSubmit">Salvar cliente</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    (function () {
+        const modalElement = document.getElementById('quickClientModal');
+        const form = document.getElementById('quickClientForm');
+        const alertBox = document.getElementById('quickClientAlert');
+        const submitButton = document.getElementById('quickClientSubmit');
+        const clienteSelect = document.getElementById('clienteSelect');
+        const modal = modalElement ? bootstrap.Modal.getOrCreateInstance(modalElement) : null;
+
+        if (!modalElement || !form || !alertBox || !submitButton || !clienteSelect || !modal) {
+            return;
+        }
+
+        const showAlert = function (message, type) {
+            alertBox.className = `alert alert-${type}`;
+            alertBox.textContent = message;
+            alertBox.classList.remove('d-none');
+        };
+
+        const clearAlert = function () {
+            alertBox.className = 'alert d-none';
+            alertBox.textContent = '';
+        };
+
+        modalElement.addEventListener('hidden.bs.modal', function () {
+            form.reset();
+            clearAlert();
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Salvar cliente';
+        });
+
+        submitButton.addEventListener('click', async function () {
+            clearAlert();
+
+            if (!form.reportValidity()) {
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando';
+
+            try {
+                const formData = new FormData(form);
+
+                const response = await fetch("{{ route('clientes.store') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    if (data.errors) {
+                        const firstError = Object.values(data.errors)[0][0];
+                        throw new Error(firstError);
+                    }
+
+                    throw new Error(data.message || 'Não foi possível cadastrar o cliente.');
+                }
+
+                const cliente = data.cliente;
+                const option = document.createElement('option');
+                option.value = cliente.id;
+                option.textContent = `${cliente.nome} (${cliente.cpf_cnpj || 'Sem documento'})`;
+                option.selected = true;
+                clienteSelect.appendChild(option);
+                clienteSelect.value = cliente.id;
+
+                modal.hide();
+            } catch (error) {
+                showAlert(error.message || 'Não foi possível cadastrar o cliente.', 'danger');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Salvar cliente';
+            }
+        });
+    })();
+</script>
 @endsection
