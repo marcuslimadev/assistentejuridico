@@ -18,7 +18,7 @@ class ChatController extends Controller
             'message' => 'required|string'
         ]);
 
-        $openaiApiKey = env('OPENAI_API_KEY') ?: env('OPENAI_KEY');
+        $openaiApiKey = config('services.openai.api_key');
         
         if (!$openaiApiKey) {
             return response()->json([
