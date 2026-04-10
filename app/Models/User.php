@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'celular',
+        'consulta_credits',
         'google_calendar_token',
         'google_calendar_refresh_token',
         'google_calendar_token_expires_at',
@@ -52,6 +53,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'consulta_credits' => 'integer',
             'google_calendar_token' => 'encrypted:array',
             'google_calendar_refresh_token' => 'encrypted',
             'google_calendar_token_expires_at' => 'datetime',

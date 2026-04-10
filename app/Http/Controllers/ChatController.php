@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ConsultaCreditService;
+use App\Services\DataJudService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
 
 class ChatController extends Controller
 {
@@ -17,6 +20,62 @@ class ChatController extends Controller
         $request->validate([
             'message' => 'required|string'
         ]);
+
+        $dataJudService = app(DataJudService::class);
+        $consultaCreditService = app(ConsultaCreditService::class);
+        $user = $request->user()->fresh();
+        $processNumber = $dataJudService->extractProcessNumber($request->message);
+
+        if ($processNumber) {
+            if (! $dataJudService->isConfigured()) {
+                return response()->json([
+                    'error' => 'Integração DataJud não configurada no servidor.'
+                ], 500);
+            }
+
+            if ($user->consulta_credits < 1) {
+                return response()->json([
+                    'error' => 'Você não possui créditos suficientes para consultar esse processo.',
+                    'credits_remaining' => 0,
+                    'buy_url' => route('credits.index'),
+                ], 402);
+            }
+
+            try {
+                $process = $dataJudService->queryByProcessNumber($processNumber);
+
+                if (! $process) {
+                    $user = $consultaCreditService->consumeForDataJud(
+                        $user,
+                        $processNumber,
+                        'Processo não encontrado no DataJud.',
+                        ['result' => 'not_found']
+                    );
+
+                    return response()->json([
+                        'reply' => 'Processo não encontrado no DataJud para o número '.$processNumber.'.',
+                        'credits_remaining' => $user->consulta_credits,
+                    ]);
+                }
+
+                $reply = $dataJudService->formatProcessResponse($processNumber, $process);
+                $user = $consultaCreditService->consumeForDataJud(
+                    $user,
+                    $processNumber,
+                    $reply,
+                    ['result' => 'found']
+                );
+
+                return response()->json([
+                    'reply' => $reply,
+                    'credits_remaining' => $user->consulta_credits,
+                ]);
+            } catch (RuntimeException $exception) {
+                return response()->json([
+                    'error' => $exception->getMessage()
+                ], 500);
+            }
+        }
 
         $openaiApiKey = config('services.openai.api_key');
         
@@ -38,7 +97,8 @@ class ChatController extends Controller
 
             if ($response->successful()) {
                 return response()->json([
-                    'reply' => $response->json('choices.0.message.content')
+                    'reply' => $response->json('choices.0.message.content'),
+                    'credits_remaining' => $user->consulta_credits,
                 ]);
             }
 

@@ -46,4 +46,18 @@ return [
         'api_key' => env('OPENAI_API_KEY', env('OPENAI_KEY')),
     ],
 
+    'datajud' => [
+        'api_key' => env('DATAJUD_KEY'),
+    ],
+
+    'mercado_pago' => [
+        'access_token' => env('MERCADO_PAGO_ACCESS_TOKEN'),
+        'webhook_secret' => env('MERCADO_PAGO_WEBHOOK_SECRET'),
+        'notification_url' => env('MERCADO_PAGO_NOTIFICATION_URL', rtrim((string) env('APP_URL'), '/').'/webhooks/mercado-pago'),
+    ],
+
+    'billing' => [
+        'consulta_unit_price_cents' => (int) env('CONSULTA_UNIT_PRICE_CENTS', 5),
+    ],
+
 ];

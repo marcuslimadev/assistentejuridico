@@ -7,6 +7,10 @@
             <h2 class="page-title">Assistente Jurídico</h2>
             <p class="page-subtitle">Converse com a IA sem quebrar o tema visual do restante da plataforma.</p>
         </div>
+        <div class="text-end">
+            <div class="small text-body-secondary">Créditos DataJud</div>
+            <div class="fw-bold fs-5" id="chatCreditsBalance">{{ auth()->user()->consulta_credits }}</div>
+        </div>
     </div>
 
     <div class="chat-shell">
@@ -70,6 +74,12 @@
                 </ul>
             </div>
             <div class="chat-side-card">
+                <div class="chat-kicker"><i class="bi bi-cash-coin"></i>Créditos</div>
+                <h6 class="fw-bold mb-2">Consulta DataJud custa 1 crédito</h6>
+                <p class="text-body-secondary small mb-3">Saldo atual: <strong id="chatCreditsBalanceSide">{{ auth()->user()->consulta_credits }}</strong> crédito(s).</p>
+                <a href="{{ route('credits.index') }}" class="btn btn-outline-primary w-100">Comprar créditos via Pix</a>
+            </div>
+            <div class="chat-side-card">
                 <div class="chat-kicker"><i class="bi bi-lightning-charge"></i>Atalhos</div>
                 <h6 class="fw-bold mb-2">Demandas frequentes</h6>
                 <ul class="chat-side-list">
@@ -99,6 +109,17 @@
     const chatInput = document.getElementById('chatInput');
     const chatBox = document.getElementById('chatBox');
     const btnSend = document.getElementById('btnSend');
+    const chatCreditsBalance = document.getElementById('chatCreditsBalance');
+    const chatCreditsBalanceSide = document.getElementById('chatCreditsBalanceSide');
+
+    const updateCreditsBalance = function (value) {
+        if (typeof value !== 'number') {
+            return;
+        }
+
+        chatCreditsBalance.textContent = value;
+        chatCreditsBalanceSide.textContent = value;
+    };
 
     const appendMessage = function (role, text) {
         const safeText = text
@@ -147,10 +168,15 @@
 
             const data = await res.json();
 
+            if (typeof data.credits_remaining === 'number') {
+                updateCreditsBalance(data.credits_remaining);
+            }
+
             if (data.reply) {
                 appendMessage('assistant', data.reply);
             } else {
-                appendMessage('error', `Erro: ${data.error || 'Falha ao processar.'}`);
+                const suffix = data.buy_url ? ' Abra a tela de créditos para comprar mais consultas.' : '';
+                appendMessage('error', `Erro: ${data.error || 'Falha ao processar.'}${suffix}`);
             }
         } catch (error) {
             appendMessage('error', 'Erro de conexão.');

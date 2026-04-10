@@ -16,6 +16,7 @@ $PscpPath = "C:\Program Files\PuTTY\pscp.exe"
 $LocalConfigPath = Join-Path $RepoRoot "deploy.local.psd1"
 $LocalBuildPath = Join-Path $RepoRoot "public\build"
 $LocalEnvPath = Join-Path $RepoRoot ".env"
+$LocalLegacyBackendEnvPath = Join-Path $RepoRoot "backend\.env"
 $script:BuildAvailable = $false
 
 $DeployConfig = [ordered]@{
@@ -36,6 +37,10 @@ $DeployConfig = [ordered]@{
   DbUsername       = "u815655858_lexpraxis"
   DbPassword       = ""
   OpenAIApiKey               = ""
+  DataJudKey                 = ""
+  MercadoPagoAccessToken     = ""
+  MercadoPagoWebhookSecret   = ""
+  ConsultaUnitPriceCents     = "5"
   GoogleCalendarClientId     = ""
   GoogleCalendarClientSecret = ""
   GoogleCalendarId           = "primary"
@@ -136,6 +141,17 @@ function Import-DeployConfig {
   }
 
   $DeployConfig.OpenAIApiKey = Get-DotEnvValue -FilePath $LocalEnvPath -Key "OPENAI_API_KEY"
+  $DeployConfig.DataJudKey = Get-DotEnvValue -FilePath $LocalEnvPath -Key "DATAJUD_KEY"
+  if ([string]::IsNullOrWhiteSpace($DeployConfig.DataJudKey)) {
+    $DeployConfig.DataJudKey = Get-DotEnvValue -FilePath $LocalLegacyBackendEnvPath -Key "DATAJUD_KEY"
+  }
+  $DeployConfig.MercadoPagoAccessToken = Get-DotEnvValue -FilePath $LocalEnvPath -Key "MERCADO_PAGO_ACCESS_TOKEN"
+  $DeployConfig.MercadoPagoWebhookSecret = Get-DotEnvValue -FilePath $LocalEnvPath -Key "MERCADO_PAGO_WEBHOOK_SECRET"
+
+  $consultaUnitPriceCents = Get-DotEnvValue -FilePath $LocalEnvPath -Key "CONSULTA_UNIT_PRICE_CENTS"
+  if (-not [string]::IsNullOrWhiteSpace($consultaUnitPriceCents)) {
+    $DeployConfig.ConsultaUnitPriceCents = $consultaUnitPriceCents
+  }
   $DeployConfig.GoogleCalendarClientId = Get-DotEnvValue -FilePath $LocalEnvPath -Key "GOOGLE_CALENDAR_CLIENT_ID"
   $DeployConfig.GoogleCalendarClientSecret = Get-DotEnvValue -FilePath $LocalEnvPath -Key "GOOGLE_CALENDAR_CLIENT_SECRET"
 
@@ -233,6 +249,10 @@ function New-RemoteBootstrapScript {
   $dbUsername = ConvertTo-BashSingleQuoted $DeployConfig.DbUsername
   $dbPassword = ConvertTo-BashSingleQuoted $DeployConfig.DbPassword
   $openAIApiKey = ConvertTo-BashSingleQuoted $DeployConfig.OpenAIApiKey
+  $dataJudKey = ConvertTo-BashSingleQuoted $DeployConfig.DataJudKey
+  $mercadoPagoAccessToken = ConvertTo-BashSingleQuoted $DeployConfig.MercadoPagoAccessToken
+  $mercadoPagoWebhookSecret = ConvertTo-BashSingleQuoted $DeployConfig.MercadoPagoWebhookSecret
+  $consultaUnitPriceCents = ConvertTo-BashSingleQuoted $DeployConfig.ConsultaUnitPriceCents
   $googleCalendarClientId = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarClientId
   $googleCalendarClientSecret = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarClientSecret
   $googleCalendarId = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarId
@@ -254,6 +274,10 @@ DB_DATABASE=$dbDatabase
 DB_USERNAME=$dbUsername
 DB_PASSWORD=$dbPassword
 OPENAI_API_KEY=$openAIApiKey
+DATAJUD_KEY=$dataJudKey
+MERCADO_PAGO_ACCESS_TOKEN=$mercadoPagoAccessToken
+MERCADO_PAGO_WEBHOOK_SECRET=$mercadoPagoWebhookSecret
+CONSULTA_UNIT_PRICE_CENTS=$consultaUnitPriceCents
 GOOGLE_CALENDAR_CLIENT_ID=$googleCalendarClientId
 GOOGLE_CALENDAR_CLIENT_SECRET=$googleCalendarClientSecret
 GOOGLE_CALENDAR_REDIRECT_URI=$googleCalendarRedirect
@@ -306,6 +330,10 @@ ensure_env_value .env DB_DATABASE "`$DB_DATABASE"
 ensure_env_value .env DB_USERNAME "`$DB_USERNAME"
 ensure_env_value .env DB_PASSWORD "`$DB_PASSWORD"
 ensure_env_value .env OPENAI_API_KEY "`$OPENAI_API_KEY"
+ensure_env_value .env DATAJUD_KEY "`$DATAJUD_KEY"
+ensure_env_value .env MERCADO_PAGO_ACCESS_TOKEN "`$MERCADO_PAGO_ACCESS_TOKEN"
+ensure_env_value .env MERCADO_PAGO_WEBHOOK_SECRET "`$MERCADO_PAGO_WEBHOOK_SECRET"
+ensure_env_value .env CONSULTA_UNIT_PRICE_CENTS "`$CONSULTA_UNIT_PRICE_CENTS"
 ensure_env_value .env GOOGLE_CALENDAR_CLIENT_ID "`$GOOGLE_CALENDAR_CLIENT_ID"
 ensure_env_value .env GOOGLE_CALENDAR_CLIENT_SECRET "`$GOOGLE_CALENDAR_CLIENT_SECRET"
 ensure_env_value .env GOOGLE_CALENDAR_REDIRECT_URI "`$GOOGLE_CALENDAR_REDIRECT_URI"

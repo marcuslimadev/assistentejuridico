@@ -10,6 +10,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
         $totalClientes = Cliente::where('status', 'ativo')->count();
         $processosAndamento = Processo::where('status', 'em andamento')->count();
         
@@ -19,6 +20,7 @@ class DashboardController extends Controller
         $honorariosMes = 0;
 
         return view('dashboard', compact(
+            'user',
             'totalClientes', 
             'processosAndamento',
             'audiencias7Dias',

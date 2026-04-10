@@ -27,8 +27,12 @@ use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\DocTemplateController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\GoogleCalendarController;
+use App\Http\Controllers\CreditController;
+use App\Http\Controllers\MercadoPagoWebhookController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\PortalController;
+
+Route::post('/webhooks/mercado-pago', MercadoPagoWebhookController::class)->name('webhooks.mercado-pago');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -45,6 +49,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/google-calendar/connect', [GoogleCalendarController::class, 'redirect'])->name('google-calendar.redirect');
     Route::get('/google-calendar/callback', [GoogleCalendarController::class, 'callback'])->name('google-calendar.callback');
     Route::delete('/google-calendar/disconnect', [GoogleCalendarController::class, 'destroy'])->name('google-calendar.destroy');
+    Route::get('/creditos', [CreditController::class, 'index'])->name('credits.index');
+    Route::post('/creditos', [CreditController::class, 'store'])->name('credits.store');
+    Route::get('/creditos/{purchase}', [CreditController::class, 'show'])->name('credits.show');
     
     // Chat AI
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');

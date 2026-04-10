@@ -46,6 +46,10 @@
                         <div class="hero-stat-label">Agenda próxima</div>
                         <div class="hero-stat-value">{{ $audiencias7Dias }}</div>
                     </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-label">Créditos de consulta</div>
+                        <div class="hero-stat-value">{{ $user->consulta_credits }}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -118,6 +122,15 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="metric-card d-flex flex-row align-items-center gap-3">
+                <div class="metric-icon"><i class="bi bi-cash-coin"></i></div>
+                <div>
+                    <h4 class="mb-0 fw-bold">{{ $user->consulta_credits }}</h4>
+                    <span class="text-body-secondary small">Créditos DataJud</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row g-4 mb-4">
@@ -140,6 +153,13 @@
                 <i class="bi bi-chat-square-dots"></i>
                 <div class="fw-bold mb-1">Chat IA</div>
                 <div class="text-body-secondary small">Peça sínteses, rascunhos e apoio analítico direto no fluxo de trabalho.</div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ route('credits.index') }}" class="quick-action-card d-block">
+                <i class="bi bi-qr-code-scan"></i>
+                <div class="fw-bold mb-1">Comprar créditos</div>
+                <div class="text-body-secondary small">Gere Pix instantâneo para repor consultas DataJud em tempo real.</div>
             </a>
         </div>
     </div>

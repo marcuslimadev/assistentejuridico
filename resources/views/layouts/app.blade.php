@@ -925,6 +925,11 @@
                         <i class="bi bi-chat-dots me-2"></i> Chat IA
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('credits.index') }}" class="nav-link {{ request()->routeIs('credits.*') ? 'active' : '' }}">
+                        <i class="bi bi-cash-coin me-2"></i> Créditos
+                    </a>
+                </li>
             </ul>
         </aside>
 
@@ -932,7 +937,7 @@
             <header class="topbar">
                 <div class="topbar-meta">
                     <strong>@yield('title')</strong>
-                    <span>{{ now()->format('d/m/Y') }} • Ambiente jurídico operacional</span>
+                    <span>{{ now()->format('d/m/Y') }} • {{ auth()->user()->consulta_credits ?? 0 }} crédito(s) disponível(is)</span>
                 </div>
                 <div class="topbar-actions">
                     <div class="theme-picker">
