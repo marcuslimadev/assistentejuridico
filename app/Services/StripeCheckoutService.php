@@ -7,17 +7,20 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use RuntimeException;
 
 class StripeCheckoutService
 {
+    protected const SUPPORTED_PAYMENT_METHODS = ['card', 'boleto'];
+
     public function isConfigured(): bool
     {
         return filled(config('services.stripe.secret_key'));
     }
 
-    public function createPixPurchase(User $user, int $creditsQuantity): CreditPurchase
+    public function createCheckoutPurchase(User $user, int $creditsQuantity, string $paymentMethod): CreditPurchase
     {
         if (! $this->isConfigured()) {
             throw new RuntimeException('Stripe não configurada no servidor.');
@@ -27,52 +30,75 @@ class StripeCheckoutService
             throw new RuntimeException('A quantidade de créditos deve ser maior que zero.');
         }
 
+        if (! in_array($paymentMethod, self::SUPPORTED_PAYMENT_METHODS, true)) {
+            throw new RuntimeException('Forma de pagamento invalida.');
+        }
+
         $unitPriceCents = (int) config('services.billing.consulta_unit_price_cents', 5);
         $externalReference = (string) Str::uuid();
 
-        $response = $this->stripeRequest()
-            ->asForm()
-            ->post('https://api.stripe.com/v1/checkout/sessions', [
-                'mode' => 'payment',
-                'success_url' => config('services.stripe.success_url'),
-                'cancel_url' => config('services.stripe.cancel_url'),
-                'customer_email' => $user->email,
-                'locale' => 'pt-BR',
-                'payment_method_types' => ['pix'],
-                'payment_method_options' => [
-                    'pix' => [
-                        'expires_after_seconds' => 14400,
+        $payload = [
+            'mode' => 'payment',
+            'success_url' => config('services.stripe.success_url'),
+            'cancel_url' => config('services.stripe.cancel_url'),
+            'customer_email' => $user->email,
+            'locale' => 'pt-BR',
+            'payment_method_types' => [$paymentMethod],
+            'line_items' => [[
+                'quantity' => $creditsQuantity,
+                'price_data' => [
+                    'currency' => 'brl',
+                    'unit_amount' => $unitPriceCents,
+                    'product_data' => [
+                        'name' => 'Crédito de consulta DataJud',
+                        'description' => '1 crédito libera 1 consulta DataJud.',
                     ],
                 ],
-                'line_items' => [[
-                    'quantity' => $creditsQuantity,
-                    'price_data' => [
-                        'currency' => 'brl',
-                        'unit_amount' => $unitPriceCents,
-                        'product_data' => [
-                            'name' => 'Crédito de consulta DataJud',
-                            'description' => '1 crédito libera 1 consulta DataJud.',
-                        ],
-                    ],
-                ]],
+            ]],
+            'metadata' => [
+                'external_reference' => $externalReference,
+                'user_id' => (string) $user->id,
+                'credits_quantity' => (string) $creditsQuantity,
+                'payment_method' => $paymentMethod,
+            ],
+            'payment_intent_data' => [
+                'description' => sprintf('Compra de %d crédito(s) de consulta', $creditsQuantity),
                 'metadata' => [
                     'external_reference' => $externalReference,
                     'user_id' => (string) $user->id,
                     'credits_quantity' => (string) $creditsQuantity,
+                    'payment_method' => $paymentMethod,
                 ],
-                'payment_intent_data' => [
-                    'description' => sprintf('Compra de %d crédito(s) de consulta', $creditsQuantity),
-                    'metadata' => [
-                        'external_reference' => $externalReference,
-                        'user_id' => (string) $user->id,
-                        'credits_quantity' => (string) $creditsQuantity,
-                    ],
-                    'receipt_email' => $user->email,
+                'receipt_email' => $user->email,
+            ],
+        ];
+
+        if ($paymentMethod === 'boleto') {
+            $payload['tax_id_collection'] = [
+                'enabled' => true,
+            ];
+            $payload['payment_method_options'] = [
+                'boleto' => [
+                    'expires_after_days' => 3,
                 ],
-            ]);
+            ];
+        }
+
+        $response = $this->stripeRequest()
+            ->asForm()
+            ->post('https://api.stripe.com/v1/checkout/sessions', $payload);
 
         if (! $response->successful()) {
-            throw new RuntimeException('Falha ao criar cobrança Pix na Stripe.');
+            throw new RuntimeException($this->buildStripeErrorMessage(
+                $response->status(),
+                $response->json(),
+                'Falha ao criar checkout na Stripe.',
+                [
+                    'user_id' => $user->id,
+                    'credits_quantity' => $creditsQuantity,
+                    'payment_method' => $paymentMethod,
+                ]
+            ));
         }
 
         $payload = $response->json();
@@ -152,7 +178,15 @@ class StripeCheckoutService
         );
 
         if (! $response->successful()) {
-            throw new RuntimeException('Falha ao consultar pagamento na Stripe.');
+            throw new RuntimeException($this->buildStripeErrorMessage(
+                $response->status(),
+                $response->json(),
+                'Falha ao consultar pagamento na Stripe.',
+                [
+                    'purchase_id' => $purchase->id,
+                    'provider_session_id' => $purchase->provider_session_id,
+                ]
+            ));
         }
 
         return $this->updatePurchaseFromSession($purchase, $response->json());
@@ -183,12 +217,16 @@ class StripeCheckoutService
             ? data_get($paymentIntent, 'next_action.pix_display_qr_code.hosted_instructions_url')
             : null;
 
+        $hostedVoucherUrl = is_array($paymentIntent)
+            ? data_get($paymentIntent, 'next_action.boleto_display_details.hosted_voucher_url')
+            : null;
+
         $purchase->forceFill([
             'payment_provider' => 'stripe',
             'provider_session_id' => (string) ($session['id'] ?? $purchase->provider_session_id),
             'provider_payment_id' => $paymentIntentId,
             'status' => $this->mapCheckoutStatus($session['status'] ?? null, $session['payment_status'] ?? null, $overrideStatus),
-            'ticket_url' => $hostedInstructionsUrl ?: ($session['url'] ?? $purchase->ticket_url),
+            'ticket_url' => $hostedVoucherUrl ?: ($hostedInstructionsUrl ?: ($session['url'] ?? $purchase->ticket_url)),
             'payment_payload' => $session,
             'expires_at' => isset($session['expires_at']) ? Carbon::createFromTimestamp((int) $session['expires_at']) : $purchase->expires_at,
             'approved_at' => ($this->mapCheckoutStatus($session['status'] ?? null, $session['payment_status'] ?? null, $overrideStatus) === 'approved') ? ($purchase->approved_at ?? now()) : $purchase->approved_at,
@@ -232,5 +270,38 @@ class StripeCheckoutService
         }
 
         return $parts;
+    }
+
+    protected function buildStripeErrorMessage(int $status, ?array $payload, string $fallbackMessage, array $context = []): string
+    {
+        $errorMessage = trim((string) data_get($payload, 'error.message', ''));
+        $errorParam = trim((string) data_get($payload, 'error.param', ''));
+        $requestLogUrl = trim((string) data_get($payload, 'error.request_log_url', ''));
+
+        Log::warning('Stripe request failed.', array_filter([
+            'status' => $status,
+            'error_message' => $errorMessage,
+            'error_param' => $errorParam,
+            'request_log_url' => $requestLogUrl,
+            'payload' => $payload,
+            ...$context,
+        ], static fn ($value) => $value !== null && $value !== ''));
+
+        if (preg_match('/payment method type provided:\s*([a-z_]+)/i', $errorMessage, $matches) === 1) {
+            $invalidMethod = strtolower($matches[1]);
+
+            return match ($invalidMethod) {
+                'pix' => 'A conta Stripe ainda nao esta habilitada para Pix. Ative o Pix no painel da Stripe e tente novamente.',
+                'boleto' => 'O boleto ainda nao esta habilitado na conta Stripe. Ative o boleto no painel da Stripe e tente novamente.',
+                'card' => 'O pagamento por cartao nao esta habilitado na conta Stripe. Verifique os metodos de pagamento no painel.',
+                default => 'A forma de pagamento escolhida nao esta habilitada na conta Stripe.',
+            };
+        }
+
+        if ($errorMessage !== '') {
+            return $fallbackMessage.' '.$errorMessage;
+        }
+
+        return $fallbackMessage.' Codigo HTTP '.$status.'.';
     }
 }

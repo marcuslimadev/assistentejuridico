@@ -38,10 +38,15 @@ class CreditController extends Controller
     {
         $validated = $request->validate([
             'credits_quantity' => ['required', 'integer', 'min:1', 'max:5000'],
+            'payment_method' => ['required', 'string', 'in:card,boleto'],
         ]);
 
         try {
-            $purchase = $stripeCheckoutService->createPixPurchase($request->user(), (int) $validated['credits_quantity']);
+            $purchase = $stripeCheckoutService->createCheckoutPurchase(
+                $request->user(),
+                (int) $validated['credits_quantity'],
+                $validated['payment_method']
+            );
         } catch (RuntimeException $exception) {
             return response()->json([
                 'error' => $exception->getMessage(),
@@ -77,9 +82,13 @@ class CreditController extends Controller
 
     protected function serializePurchase(CreditPurchase $purchase): array
     {
+        $paymentMethod = (string) data_get($purchase->payment_payload, 'metadata.payment_method', 'card');
+
         return [
             'id' => $purchase->id,
             'payment_provider' => $purchase->payment_provider,
+            'payment_method' => $paymentMethod,
+            'payment_method_label' => $this->paymentMethodLabel($paymentMethod),
             'status' => $purchase->status,
             'credits_quantity' => $purchase->credits_quantity,
             'total_amount_cents' => $purchase->total_amount_cents,
@@ -90,5 +99,13 @@ class CreditController extends Controller
             'approved_at' => optional($purchase->approved_at)?->toIso8601String(),
             'expires_at' => optional($purchase->expires_at)?->toIso8601String(),
         ];
+    }
+
+    protected function paymentMethodLabel(string $paymentMethod): string
+    {
+        return match ($paymentMethod) {
+            'boleto' => 'Boleto',
+            default => 'Cartao de credito',
+        };
     }
 }
