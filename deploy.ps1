@@ -35,6 +35,7 @@ $DeployConfig = [ordered]@{
   DbDatabase       = "u815655858_lexpraxis"
   DbUsername       = "u815655858_lexpraxis"
   DbPassword       = ""
+  OpenAIApiKey               = ""
   GoogleCalendarClientId     = ""
   GoogleCalendarClientSecret = ""
   GoogleCalendarId           = "primary"
@@ -134,6 +135,7 @@ function Import-DeployConfig {
     }
   }
 
+  $DeployConfig.OpenAIApiKey = Get-DotEnvValue -FilePath $LocalEnvPath -Key "OPENAI_API_KEY"
   $DeployConfig.GoogleCalendarClientId = Get-DotEnvValue -FilePath $LocalEnvPath -Key "GOOGLE_CALENDAR_CLIENT_ID"
   $DeployConfig.GoogleCalendarClientSecret = Get-DotEnvValue -FilePath $LocalEnvPath -Key "GOOGLE_CALENDAR_CLIENT_SECRET"
 
@@ -230,6 +232,7 @@ function New-RemoteBootstrapScript {
   $dbDatabase = ConvertTo-BashSingleQuoted $DeployConfig.DbDatabase
   $dbUsername = ConvertTo-BashSingleQuoted $DeployConfig.DbUsername
   $dbPassword = ConvertTo-BashSingleQuoted $DeployConfig.DbPassword
+  $openAIApiKey = ConvertTo-BashSingleQuoted $DeployConfig.OpenAIApiKey
   $googleCalendarClientId = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarClientId
   $googleCalendarClientSecret = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarClientSecret
   $googleCalendarId = ConvertTo-BashSingleQuoted $DeployConfig.GoogleCalendarId
@@ -250,6 +253,7 @@ DB_PORT=$dbPort
 DB_DATABASE=$dbDatabase
 DB_USERNAME=$dbUsername
 DB_PASSWORD=$dbPassword
+OPENAI_API_KEY=$openAIApiKey
 GOOGLE_CALENDAR_CLIENT_ID=$googleCalendarClientId
 GOOGLE_CALENDAR_CLIENT_SECRET=$googleCalendarClientSecret
 GOOGLE_CALENDAR_REDIRECT_URI=$googleCalendarRedirect
@@ -301,6 +305,7 @@ ensure_env_value .env DB_PORT "`$DB_PORT"
 ensure_env_value .env DB_DATABASE "`$DB_DATABASE"
 ensure_env_value .env DB_USERNAME "`$DB_USERNAME"
 ensure_env_value .env DB_PASSWORD "`$DB_PASSWORD"
+ensure_env_value .env OPENAI_API_KEY "`$OPENAI_API_KEY"
 ensure_env_value .env GOOGLE_CALENDAR_CLIENT_ID "`$GOOGLE_CALENDAR_CLIENT_ID"
 ensure_env_value .env GOOGLE_CALENDAR_CLIENT_SECRET "`$GOOGLE_CALENDAR_CLIENT_SECRET"
 ensure_env_value .env GOOGLE_CALENDAR_REDIRECT_URI "`$GOOGLE_CALENDAR_REDIRECT_URI"
